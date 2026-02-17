@@ -3,38 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OpenClaw Dashboard - Drag & Drop</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>OpenClaw Dashboard | Real-Time</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
         :root {
-            --bg-primary: #0d1117;
-            --bg-secondary: #161b22;
-            --bg-tertiary: #21262d;
-            --bg-hover: #2d333b;
-            --text-primary: #e6edf3;
-            --text-secondary: #8b949e;
-            --accent: #58a6ff;
-            --accent-hover: #79c0ff;
-            --success: #238636;
-            --success-light: #3fb950;
-            --warning: #d29922;
-            --warning-light: #e3b341;
-            --danger: #da3633;
-            --danger-light: #f85149;
-            --border: #30363d;
-            --border-hover: #8b949e;
-            --shadow: 0 4px 12px rgba(0,0,0,0.4);
-            --shadow-lg: 0 8px 24px rgba(0,0,0,0.5);
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-card: rgba(255,255,255,0.03);
+            --border: rgba(255,255,255,0.08);
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --accent: #6366f1;
+            --accent-glow: rgba(99, 102, 241, 0.3);
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
         }
         
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Inter', -apple-system, sans-serif;
             background: var(--bg-primary);
             color: var(--text-primary);
             min-height: 100vh;
-            line-height: 1.5;
+            overflow-x: hidden;
+        }
+        
+        /* Background Animation */
+        .bg-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                linear-gradient(rgba(99, 102, 241, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(99, 102, 241, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
         }
         
         /* Header */
@@ -50,984 +59,799 @@
             z-index: 100;
         }
         
-        .header h1 {
-            font-size: 1.5rem;
+        .logo {
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            font-weight: 600;
         }
         
-        .header-actions {
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent) 0%, #8b5cf6 100%);
+            border-radius: 10px;
             display: flex;
             align-items: center;
-            gap: 1rem;
+            justify-content: center;
+            font-size: 1.25rem;
         }
         
-        .status-indicator {
+        .logo-text {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+        
+        .logo-text span {
+            color: var(--accent);
+        }
+        
+        .live-indicator {
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            font-size: 0.875rem;
-            color: var(--text-secondary);
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 500;
         }
         
-        .status-dot {
-            width: 10px;
-            height: 10px;
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--success);
             border-radius: 50%;
-            background: var(--success-light);
             animation: pulse 2s infinite;
-            box-shadow: 0 0 8px var(--success-light);
         }
         
         @keyframes pulse {
             0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.6; transform: scale(0.9); }
-        }
-        
-        .btn {
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border);
-            color: var(--text-primary);
-            padding: 0.625rem 1.25rem;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.875rem;
-            font-weight: 500;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: all 0.2s ease;
-        }
-        
-        .btn:hover {
-            background: var(--bg-hover);
-            border-color: var(--border-hover);
-            transform: translateY(-1px);
-        }
-        
-        .btn-primary {
-            background: var(--accent);
-            border-color: var(--accent);
-            color: #fff;
-        }
-        
-        .btn-primary:hover {
-            background: var(--accent-hover);
-        }
-        
-        .btn-success {
-            background: var(--success);
-            border-color: var(--success);
-            color: #fff;
+            50% { opacity: 0.5; transform: scale(1.2); }
         }
         
         /* Container */
         .container {
-            padding: 2rem;
-            max-width: 1600px;
+            max-width: 1400px;
             margin: 0 auto;
+            padding: 2rem;
         }
         
-        /* Board Layout */
-        .board {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 1.5rem;
-            align-items: start;
-        }
-        
-        /* Column */
-        .column {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            min-height: 200px;
-            transition: all 0.3s ease;
-        }
-        
-        .column.drag-over {
-            border-color: var(--accent);
-            background: rgba(88, 166, 255, 0.05);
-            box-shadow: var(--shadow-lg);
-        }
-        
-        .column-header {
-            padding: 1rem 1.25rem;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: grab;
-            user-select: none;
-            background: var(--bg-tertiary);
-            border-radius: 12px 12px 0 0;
-        }
-        
-        .column-header:active {
-            cursor: grabbing;
-        }
-        
-        .column-title {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            font-weight: 600;
-            font-size: 0.9375rem;
-        }
-        
-        .column-icon {
-            width: 32px;
-            height: 32px;
-            background: var(--bg-secondary);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1rem;
-        }
-        
-        .column-count {
-            background: var(--bg-secondary);
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-        }
-        
-        .column-content {
-            padding: 1rem;
-            min-height: 150px;
-        }
-        
-        /* Cards */
-        .card {
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 1rem;
-            margin-bottom: 0.75rem;
-            cursor: grab;
-            transition: all 0.2s ease;
-            position: relative;
-        }
-        
-        .card:hover {
-            border-color: var(--border-hover);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow);
-        }
-        
-        .card.dragging {
-            opacity: 0.5;
-            cursor: grabbing;
-            transform: rotate(2deg);
-        }
-        
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 0.75rem;
-        }
-        
-        .card-title {
-            font-weight: 600;
-            font-size: 0.9375rem;
-            line-height: 1.4;
-            flex: 1;
-            margin-right: 0.5rem;
-        }
-        
-        .card-drag-handle {
-            color: var(--text-secondary);
-            cursor: grab;
-            padding: 0.25rem;
-            opacity: 0;
-            transition: opacity 0.2s;
-        }
-        
-        .card:hover .card-drag-handle {
-            opacity: 1;
-        }
-        
-        .card-drag-handle:hover {
-            color: var(--text-primary);
-        }
-        
-        .card-meta {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-        }
-        
-        .card-meta-item {
-            display: flex;
-            align-items: center;
-            gap: 0.375rem;
-        }
-        
-        /* Badges */
-        .badge {
-            padding: 0.25rem 0.625rem;
-            border-radius: 20px;
-            font-size: 0.6875rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.025em;
-        }
-        
-        .badge-success { background: rgba(35, 134, 54, 0.2); color: var(--success-light); }
-        .badge-warning { background: rgba(210, 153, 34, 0.2); color: var(--warning-light); }
-        .badge-danger { background: rgba(218, 54, 51, 0.2); color: var(--danger-light); }
-        .badge-info { background: rgba(88, 166, 255, 0.2); color: var(--accent); }
-        .badge-neutral { background: var(--bg-secondary); color: var(--text-secondary); }
-        
-        /* Progress Bar */
-        .progress-bar {
-            width: 100%;
-            height: 6px;
-            background: var(--bg-secondary);
-            border-radius: 3px;
-            overflow: hidden;
-            margin-top: 0.75rem;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--accent), var(--accent-hover));
-            border-radius: 3px;
-            transition: width 0.3s ease;
-        }
-        
-        /* Priority Indicators */
-        .priority {
-            display: flex;
-            align-items: center;
-            gap: 0.375rem;
-            font-size: 0.75rem;
-            font-weight: 500;
-        }
-        
-        .priority-high { color: var(--danger-light); }
-        .priority-medium { color: var(--warning-light); }
-        .priority-low { color: var(--success-light); }
-        
-        /* Add Button */
-        .add-card-btn {
-            width: 100%;
-            padding: 0.75rem;
-            background: transparent;
-            border: 2px dashed var(--border);
-            border-radius: 8px;
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-        
-        .add-card-btn:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-            background: rgba(88, 166, 255, 0.05);
-        }
-        
-        /* Stats Overview */
-        .stats-bar {
+        /* Stats Row */
+        .stats-row {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 1rem;
+            gap: 1.5rem;
             margin-bottom: 2rem;
         }
         
         .stat-card {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 1.25rem;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            transition: all 0.2s;
-        }
-        
-        .stat-card:hover {
-            border-color: var(--border-hover);
-            transform: translateY(-2px);
-        }
-        
-        .stat-icon {
-            width: 48px;
-            height: 48px;
-            background: var(--bg-tertiary);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-        }
-        
-        .stat-info h3 {
-            font-size: 1.75rem;
-            font-weight: 700;
-            color: var(--accent);
-        }
-        
-        .stat-info p {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-        }
-        
-        /* Modal */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.7);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .modal-overlay.active {
-            display: flex;
-        }
-        
-        .modal {
-            background: var(--bg-secondary);
+            background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: 16px;
             padding: 1.5rem;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: var(--shadow-lg);
+            backdrop-filter: blur(10px);
         }
         
-        .modal-header {
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        
+        .stat-change {
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+        }
+        
+        .stat-change.positive { color: var(--success); }
+        .stat-change.negative { color: var(--danger); }
+        
+        /* Main Grid */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        /* Card Base */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+        }
+        
+        .card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1.5rem;
         }
         
-        .modal-title {
-            font-size: 1.25rem;
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .card-badge {
+            background: rgba(99, 102, 241, 0.2);
+            color: var(--accent);
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
             font-weight: 600;
         }
         
-        .modal-close {
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            font-size: 1.5rem;
-            cursor: pointer;
-            padding: 0.25rem;
-        }
-        
-        .modal-close:hover {
-            color: var(--text-primary);
-        }
-        
-        .form-group {
-            margin-bottom: 1rem;
-        }
-        
-        .form-label {
-            display: block;
-            font-size: 0.875rem;
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-            color: var(--text-secondary);
-        }
-        
-        .form-input, .form-select {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            color: var(--text-primary);
-            font-size: 0.9375rem;
-            transition: all 0.2s;
-        }
-        
-        .form-input:focus, .form-select:focus {
-            outline: none;
-            border-color: var(--accent);
-        }
-        
-        .form-actions {
+        /* Projects */
+        .project-list {
             display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .project-item {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .project-item:hover {
+            background: rgba(255,255,255,0.04);
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+        
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        
+        .project-name {
+            font-weight: 600;
+        }
+        
+        .project-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .project-status.active {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+        }
+        
+        .project-status.paused {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--warning);
+        }
+        
+        .project-progress {
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+        
+        .project-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent) 0%, #8b5cf6 100%);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+        
+        .project-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        
+        /* Tasks */
+        .task-list {
+            display: flex;
+            flex-direction: column;
             gap: 0.75rem;
-            justify-content: flex-end;
-            margin-top: 1.5rem;
+        }
+        
+        .task-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .task-item:hover {
+            background: rgba(255,255,255,0.04);
+        }
+        
+        .task-priority {
+            width: 4px;
+            height: 40px;
+            border-radius: 2px;
+        }
+        
+        .task-priority.high { background: var(--danger); }
+        .task-priority.medium { background: var(--warning); }
+        .task-priority.low { background: var(--success); }
+        
+        .task-content {
+            flex: 1;
+        }
+        
+        .task-title {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+        
+        .task-meta {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        
+        .task-time {
+            font-size: 0.85rem;
+            color: var(--accent);
+            font-weight: 500;
+        }
+        
+        /* Services */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+        
+        .service-item {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.25rem;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .service-item.online {
+            border-color: rgba(16, 185, 129, 0.3);
+            background: rgba(16, 185, 129, 0.05);
+        }
+        
+        .service-item.offline {
+            border-color: rgba(239, 68, 68, 0.3);
+            background: rgba(239, 68, 68, 0.05);
+        }
+        
+        .service-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin: 0 auto 0.75rem;
+        }
+        
+        .service-item.online .service-icon {
+            background: rgba(16, 185, 129, 0.15);
+        }
+        
+        .service-item.offline .service-icon {
+            background: rgba(239, 68, 68, 0.15);
+        }
+        
+        .service-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .service-status {
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        .service-item.online .service-status {
+            color: var(--success);
+        }
+        
+        .service-item.offline .service-status {
+            color: var(--danger);
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        
+        .service-item.online .status-dot {
+            background: var(--success);
+            animation: blink 2s infinite;
+        }
+        
+        .service-item.offline .status-dot {
+            background: var(--danger);
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        
+        /* Activity Log */
+        .activity-log {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .activity-item {
+            display: flex;
+            gap: 1rem;
+            padding: 0.875rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+        
+        .activity-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+        
+        .activity-icon.create { background: rgba(59, 130, 246, 0.15); }
+        .activity-icon.complete { background: rgba(16, 185, 129, 0.15); }
+        .activity-icon.move { background: rgba(245, 158, 11, 0.15); }
+        .activity-icon.delete { background: rgba(239, 68, 68, 0.15); }
+        
+        .activity-content {
+            flex: 1;
+        }
+        
+        .activity-text {
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .activity-time {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+        
+        /* Bottom Grid */
+        .bottom-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 1.5rem;
         }
         
         /* Responsive */
-        @media (max-width: 1200px) {
-            .stats-bar {
-                grid-template-columns: repeat(2, 1fr);
-            }
+        @media (max-width: 1024px) {
+            .stats-row { grid-template-columns: repeat(2, 1fr); }
+            .main-grid { grid-template-columns: 1fr; }
+            .bottom-grid { grid-template-columns: 1fr; }
+            .services-grid { grid-template-columns: 1fr; }
         }
         
-        @media (max-width: 768px) {
-            .header {
-                padding: 1rem;
-                flex-direction: column;
-                gap: 1rem;
-            }
-            
-            .container {
-                padding: 1rem;
-            }
-            
-            .stats-bar {
-                grid-template-columns: 1fr;
-            }
-            
-            .board {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        /* Animations */
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .card {
-            animation: slideIn 0.3s ease;
+        @media (max-width: 640px) {
+            .stats-row { grid-template-columns: 1fr; }
+            .container { padding: 1rem; }
+            .header { padding: 1rem; flex-direction: column; gap: 1rem; }
         }
     </style>
 </head>
 <body>
+    <div class="bg-grid"></div>
+    
     <header class="header">
-        <h1>🐾 OpenClaw Dashboard</h1>
-        <div class="header-actions">
-            <div class="status-indicator">
-                <span class="status-dot"></span>
-                <span id="lastUpdate">Atualizado agora</span>
-            </div>
-            <button class="btn" onclick="refreshData()">
-                <i class="fas fa-sync-alt"></i> Atualizar
-            </button>
-            <button class="btn btn-primary" onclick="openModal()">
-                <i class="fas fa-plus"></i> Nova Tarefa
-            </button>
+        <div class="logo">
+            <div class="logo-icon">⚡</div>
+            <div class="logo-text">Open<span>Claw</span> Dashboard</div>
+        </div>
+        
+        <div class="live-indicator">
+            <div class="live-dot"></div>
+            <span>LIVE — Atualizando</span>
         </div>
     </header>
     
-    <main class="container">
-        <!-- Stats Overview -->
-        <div class="stats-bar">
+    <div class="container">
+        <!-- Stats Row -->
+        <div class="stats-row">
             <div class="stat-card">
-                <div class="stat-icon">🚀</div>
-                <div class="stat-info">
-                    <h3 id="statProjects">2</h3>
-                    <p>Projetos Ativos</p>
+                <div class="stat-label">Tarefas Hoje</div>
+                <div class="stat-value" id="tasks-today">12</div>
+                <div class="stat-change positive">+3 vs ontem</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-label">Tempo Trabalhado</div>
+                <div class="stat-value" id="time-worked">4h 32m</div>
+                <div class="stat-change positive">+1h 15m</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-label">Concluídas (1h)</div>
+                <div class="stat-value" id="completed-hour">5</div>
+                <div class="stat-change positive">+2</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-label">Projetos Ativos</div>
+                <div class="stat-value" id="active-projects">4</div>
+                <div class="stat-change">2 em andamento</div>
+            </div>
+        </div>
+        
+        <!-- Main Grid -->
+        <div class="main-grid">
+            <!-- Projects -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">📁 Projetos Ativos</div>
+                    <div class="card-badge" id="project-count">4</div>
+                </div>
+                
+                <div class="project-list" id="project-list">
+                    <div class="project-item" data-project="1">
+                        <div class="project-header">
+                            <div class="project-name">Landing Page Antropometria</div>
+                            <div class="project-status active">Em andamento</div>
+                        </div>
+                        <div class="project-progress">
+                            <div class="project-progress-bar" style="width: 85%"></div>
+                        </div>
+                        
+                        <div class="project-meta">
+                            <span>85% completo</span>
+                            <span class="project-updated">Atualizado há 2 min</span>
+                        </div>
+                    </div>
+                    
+                    <div class="project-item" data-project="2">
+                        <div class="project-header">
+                            <div class="project-name">Dashboard Real-Time</div>
+                            <div class="project-status active">Em andamento</div>
+                        </div>
+                        <div class="project-progress">
+                            <div class="project-progress-bar" style="width: 60%"></div>
+                        </div>
+                        
+                        <div class="project-meta">
+                            <span>60% completo</span>
+                            <span class="project-updated">Atualizado agora</span>
+                        </div>
+                    </div>
+                    
+                    <div class="project-item" data-project="3">
+                        <div class="project-header">
+                            <div class="project-name">Integração WhatsApp</div>
+                            <div class="project-status paused">Pausado</div>
+                        </div>
+                        <div class="project-progress">
+                            <div class="project-progress-bar" style="width: 30%"></div>
+                        </div>
+                        
+                        <div class="project-meta">
+                            <span>30% completo</span>
+                            <span class="project-updated">Atualizado há 1h</span>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="stat-card">
-                <div class="stat-icon">✅</div>
-                <div class="stat-info">
-                    <h3 id="statTasks">3</h3>
-                    <p>Tarefas Pendentes</p>
+            
+            <!-- Tasks -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">✓ Tarefas em Andamento</div>
+                    <div class="card-badge" id="task-count">5</div>
                 </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">💻</div>
-                <div class="stat-info">
-                    <h3 id="statSessions">1</h3>
-                    <p>Sessões Ativas</p>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">⏰</div>
-                <div class="stat-info">
-                    <h3 id="statCron">1</h3>
-                    <p>Cron Jobs</p>
+                
+                <div class="task-list" id="task-list">
+                    <div class="task-item" data-task="1">
+                        <div class="task-priority high"></div>
+                        <div class="task-content">
+                            <div class="task-title">Revisar código do dashboard</div>
+                            <div class="task-meta">Projeto: Dashboard Real-Time</div>
+                        </div>
+                        <div class="task-time">45m</div>
+                    </div>
+                    
+                    <div class="task-item" data-task="2">
+                        <div class="task-priority medium"></div>
+                        <div class="task-content">
+                            <div class="task-title">Atualizar documentação</div>
+                            <div class="task-meta">Projeto: Landing Page</div>
+                        </div>
+                        <div class="task-time">20m</div>
+                    </div>
+                    
+                    <div class="task-item" data-task="3">
+                        <div class="task-priority low"></div>
+                        <div class="task-content">
+                            <div class="task-title">Testar responsividade</div>
+                            <div class="task-meta">Projeto: Landing Page</div>
+                        </div>
+                        <div class="task-time">10m</div>
+                    </div>
                 </div>
             </div>
         </div>
         
-        <!-- Kanban Board -->
-        <div class="board" id="board">
-            <!-- Column: A Fazer -->
-            <div class="column" data-column="todo">
-                <div class="column-header" draggable="true">
-                    <div class="column-title">
-                        <div class="column-icon">📋</div>
-                        <span>A Fazer</span>
-                    </div>
-                    <span class="column-count" id="count-todo">2</span>
+        <!-- Bottom Grid -->
+        <div class="bottom-grid">
+            <!-- Services -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">🔌 Status de Serviços</div>
                 </div>
-                <div class="column-content" id="todo">
-                    <div class="card" draggable="true" data-id="1">
-                        <div class="card-header">
-                            <span class="card-title">Configurar WhatsApp</span>
-                            <span class="card-drag-handle"><i class="fas fa-grip-vertical"></i></span>
-                        </div>
-                        <div class="card-meta">
-                            <span class="card-meta-item priority priority-medium">
-                                <i class="fas fa-flag"></i> Média
-                            </span>
-                            <span class="card-meta-item">
-                                <i class="fas fa-calendar"></i> 17/02
-                            </span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: 60%"></div>
+                
+                <div class="services-grid" id="services-grid">
+                    <div class="service-item online" data-service="whatsapp">
+                        <div class="service-icon">💬</div>
+                        <div class="service-name">WhatsApp</div>
+                        <div class="service-status">
+                            <div class="status-dot"></div>
+                            Online
                         </div>
                     </div>
                     
-                    <div class="card" draggable="true" data-id="2">
-                        <div class="card-header">
-                            <span class="card-title">Revisar cron jobs</span>
-                            <span class="card-drag-handle"><i class="fas fa-grip-vertical"></i></span>
-                        </div>
-                        <div class="card-meta">
-                            <span class="card-meta-item priority priority-low">
-                                <i class="fas fa-flag"></i> Baixa
-                            </span>
-                            <span class="card-meta-item">
-                                <i class="fas fa-calendar"></i> 17/02
-                            </span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: 0%"></div>
+                    <div class="service-item online" data-service="gateway">
+                        <div class="service-icon">⚡</div>
+                        <div class="service-name">Gateway</div>
+                        <div class="service-status">
+                            <div class="status-dot"></div>
+                            Online
                         </div>
                     </div>
                     
-                    <button class="add-card-btn" onclick="openModal('todo')">
-                        <i class="fas fa-plus"></i> Adicionar tarefa
-                    </button>
+                    <div class="service-item online" data-service="cron">
+                        <div class="service-icon">⏰</div>
+                        <div class="service-name">Cron Jobs</div>
+                        <div class="service-status">
+                            <div class="status-dot"></div>
+                            Ativo
+                        </div>
+                    </div>
                 </div>
             </div>
             
-            <!-- Column: Em Progresso -->
-            <div class="column" data-column="progress">
-                <div class="column-header" draggable="true">
-                    <div class="column-title">
-                        <div class="column-icon" style="color: var(--warning-light)">⚡</div>
-                        <span>Em Progresso</span>
-                    </div>
-                    <span class="column-count" id="count-progress">1</span>
+            <!-- Activity Log -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">📋 Log de Atividades</div>
+                    <div class="card-badge" id="log-count">8</div>
                 </div>
-                <div class="column-content" id="progress">
-                    <div class="card" draggable="true" data-id="3">
-                        <div class="card-header">
-                            <span class="card-title">Criar dashboard HTML</span>
-                            <span class="card-drag-handle"><i class="fas fa-grip-vertical"></i></span>
-                        </div>
-                        <div class="card-meta">
-                            <span class="card-meta-item priority priority-high">
-                                <i class="fas fa-flag"></i> Alta
-                            </span>
-                            <span class="card-meta-item">
-                                <i class="fas fa-calendar"></i> 17/02
-                            </span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: 80%"></div>
+                
+                <div class="activity-log" id="activity-log">
+                    <div class="activity-item">
+                        <div class="activity-icon create">➕</div>
+                        <div class="activity-content">
+                            <div class="activity-text">Nova tarefa criada: "Revisar código do dashboard"</div>
+                            <div class="activity-time">Há 2 minutos</div>
                         </div>
                     </div>
                     
-                    <button class="add-card-btn" onclick="openModal('progress')">
-                        <i class="fas fa-plus"></i> Adicionar tarefa
-                    </button>
-                </div>
-            </div>
-            
-            <!-- Column: Concluído -->
-            <div class="column" data-column="done">
-                <div class="column-header" draggable="true">
-                    <div class="column-title">
-                        <div class="column-icon" style="color: var(--success-light)">✅</div>
-                        <span>Concluído</span>
-                    </div>
-                    <span class="column-count" id="count-done">1</span>
-                </div>
-                <div class="column-content" id="done">
-                    <div class="card" draggable="true" data-id="4">
-                        <div class="card-header">
-                            <span class="card-title">Setup inicial OpenClaw</span>
-                            <span class="card-drag-handle"><i class="fas fa-grip-vertical"></i></span>
-                        </div>
-                        <div class="card-meta">
-                            <span class="badge badge-success">Concluído</span>
-                            <span class="card-meta-item">
-                                <i class="fas fa-check-circle"></i> 16/02
-                            </span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: 100%"></div>
+                    <div class="activity-item">
+                        <div class="activity-icon complete">✓</div>
+                        <div class="activity-content">
+                            <div class="activity-text">Tarefa concluída: "Criar mockup 4K"</div>
+                            <div class="activity-time">Há 15 minutos</div>
                         </div>
                     </div>
                     
-                    <button class="add-card-btn" onclick="openModal('done')">
-                        <i class="fas fa-plus"></i> Adicionar tarefa
-                    </button>
-                </div>
-            </div>
-            
-            <!-- Column: Projetos -->
-            <div class="column" data-column="projects">
-                <div class="column-header" draggable="true">
-                    <div class="column-title">
-                        <div class="column-icon" style="color: var(--accent)">🚀</div>
-                        <span>Projetos</span>
-                    </div>
-                    <span class="column-count" id="count-projects">2</span>
-                </div>
-                <div class="column-content" id="projects">
-                    <div class="card" draggable="true" data-id="5">
-                        <div class="card-header">
-                            <span class="card-title">Dashboard OpenClaw</span>
-                            <span class="card-drag-handle"><i class="fas fa-grip-vertical"></i></span>
-                        </div>
-                        <div class="card-meta">
-                            <span class="badge badge-info">Em andamento</span>
-                            <span class="card-meta-item">
-                                <i class="fas fa-percentage"></i> 80%
-                            </span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: 80%"></div>
+                    <div class="activity-item">
+                        <div class="activity-icon move">↔</div>
+                        <div class="activity-content">
+                            <div class="activity-text">Projeto movido: "Dashboard" → Em andamento</div>
+                            <div class="activity-time">Há 32 minutos</div>
                         </div>
                     </div>
                     
-                    <div class="card" draggable="true" data-id="6">
-                        <div class="card-header">
-                            <span class="card-title">Integração WhatsApp</span>
-                            <span class="card-drag-handle"><i class="fas fa-grip-vertical"></i></span>
-                        </div>
-                        <div class="card-meta">
-                            <span class="badge badge-warning">Pendente</span>
-                            <span class="card-meta-item">
-                                <i class="fas fa-percentage"></i> 60%
-                            </span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: 60%"></div>
+                    <div class="activity-item">
+                        <div class="activity-icon create">➕</div>
+                        <div class="activity-content">
+                            <div class="activity-text">Novo projeto criado: "Dashboard Real-Time"</div>
+                            <div class="activity-time">Há 1 hora</div>
                         </div>
                     </div>
-                    
-                    <button class="add-card-btn" onclick="openModal('projects')">
-                        <i class="fas fa-plus"></i> Adicionar projeto
-                    </button>
                 </div>
             </div>
-        </div>
-    </main>
-    
-    <!-- Modal -->
-    <div class="modal-overlay" id="modal">
-        <div class="modal">
-            <div class="modal-header">
-                <h2 class="modal-title">Nova Tarefa</h2>
-                <button class="modal-close" onclick="closeModal()">&times;</button>
-            </div>
-            <form id="taskForm" onsubmit="addTask(event)">
-                <div class="form-group">
-                    <label class="form-label">Título</label>
-                    <input type="text" class="form-input" id="taskTitle" placeholder="Nome da tarefa" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Prioridade</label>
-                    <select class="form-select" id="taskPriority">
-                        <option value="high">Alta</option>
-                        <option value="medium" selected>Média</option>
-                        <option value="low">Baixa</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Coluna</label>
-                    <select class="form-select" id="taskColumn">
-                        <option value="todo">A Fazer</option>
-                        <option value="progress">Em Progresso</option>
-                        <option value="done">Concluído</option>
-                        <option value="projects">Projetos</option>
-                    </select>
-                </div>
-                <div class="form-actions">
-                    <button type="button" class="btn" onclick="closeModal()">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Adicionar</button>
-                </div>
-            </form>
         </div>
     </div>
     
     <script>
-        // Drag and Drop functionality
-        let draggedCard = null;
-        let draggedColumn = null;
+        // Dados simulados
+        const projects = [
+            { id: 1, name: 'Landing Page Antropometria', progress: 85, status: 'active', updated: 2 },
+            { id: 2, name: 'Dashboard Real-Time', progress: 60, status: 'active', updated: 0 },
+            { id: 3, name: 'Integração WhatsApp', progress: 30, status: 'paused', updated: 60 }
+        ];
         
-        // Initialize drag and drop
-        document.addEventListener('DOMContentLoaded', () => {
-            initDragAndDrop();
-            updateCounts();
-        });
+        const tasks = [
+            { id: 1, title: 'Revisar código do dashboard', project: 'Dashboard Real-Time', priority: 'high', time: 45 },
+            { id: 2, title: 'Atualizar documentação', project: 'Landing Page', priority: 'medium', time: 20 },
+            { id: 3, title: 'Testar responsividade', project: 'Landing Page', priority: 'low', time: 10 }
+        ];
         
-        function initDragAndDrop() {
-            // Card drag and drop
-            const cards = document.querySelectorAll('.card');
-            cards.forEach(card => {
-                card.addEventListener('dragstart', handleCardDragStart);
-                card.addEventListener('dragend', handleCardDragEnd);
-            });
-            
-            // Column drop zones
-            const columns = document.querySelectorAll('.column-content');
-            columns.forEach(column => {
-                column.addEventListener('dragover', handleDragOver);
-                column.addEventListener('drop', handleDrop);
-                column.addEventListener('dragleave', handleDragLeave);
-            });
-            
-            // Column reordering
-            const columnHeaders = document.querySelectorAll('.column-header');
-            columnHeaders.forEach(header => {
-                header.addEventListener('dragstart', handleColumnDragStart);
-                header.addEventListener('dragend', handleColumnDragEnd);
-            });
-            
-            const board = document.getElementById('board');
-            board.addEventListener('dragover', handleColumnDragOver);
-            board.addEventListener('drop', handleColumnDrop);
-        }
+        const activities = [
+            { type: 'create', text: 'Nova tarefa criada: "Revisar código do dashboard"', time: 2 },
+            { type: 'complete', text: 'Tarefa concluída: "Criar mockup 4K"', time: 15 },
+            { type: 'move', text: 'Projeto movido: "Dashboard" → Em andamento', time: 32 },
+            { type: 'create', text: 'Novo projeto criado: "Dashboard Real-Time"', time: 60 }
+        ];
         
-        // Card Drag Handlers
-        function handleCardDragStart(e) {
-            draggedCard = this;
-            this.classList.add('dragging');
-            e.dataTransfer.effectAllowed = 'move';
-            e.dataTransfer.setData('text/plain', this.dataset.id);
-        }
-        
-        function handleCardDragEnd(e) {
-            this.classList.remove('dragging');
-            draggedCard = null;
-            document.querySelectorAll('.column').forEach(col => {
-                col.classList.remove('drag-over');
-            });
-        }
-        
-        // Column Drag Handlers
-        function handleColumnDragStart(e) {
-            draggedColumn = this.parentElement;
-            this.style.opacity = '0.5';
-            e.dataTransfer.effectAllowed = 'move';
-        }
-        
-        function handleColumnDragEnd(e) {
-            this.style.opacity = '1';
-            draggedColumn = null;
-        }
-        
-        // Drop Handlers
-        function handleDragOver(e) {
-            e.preventDefault();
-            e.dataTransfer.dropEffect = 'move';
-            
-            const column = this.closest('.column');
-            column.classList.add('drag-over');
-            
-            // Auto-scroll when dragging near edges
-            const rect = this.getBoundingClientRect();
-            const offset = e.clientY - rect.top;
-            
-            if (offset < 50) {
-                this.scrollTop -= 10;
-            } else if (offset > rect.height - 50) {
-                this.scrollTop += 10;
+        // Atualização em tempo real
+        function updateStats() {
+            // Atualiza contadores aleatoriamente
+            const tasksToday = document.getElementById('tasks-today');
+            const currentTasks = parseInt(tasksToday.textContent);
+            if (Math.random() > 0.7) {
+                tasksToday.textContent = currentTasks + 1;
             }
-        }
-        
-        function handleDragLeave(e) {
-            const column = this.closest('.column');
-            column.classList.remove('drag-over');
-        }
-        
-        function handleDrop(e) {
-            e.preventDefault();
-            const column = this.closest('.column');
-            column.classList.remove('drag-over');
             
-            if (draggedCard) {
-                // Insert before the "Add" button
-                const addBtn = this.querySelector('.add-card-btn');
-                this.insertBefore(draggedCard, addBtn);
+            // Atualiza tempo trabalhado
+            const timeWorked = document.getElementById('time-worked');
+            const [hours, minutes] = timeWorked.textContent.split('h ').map(x => parseInt(x));
+            const totalMinutes = hours * 60 + minutes + 1;
+            const newHours = Math.floor(totalMinutes / 60);
+            const newMinutes = totalMinutes % 60;
+            timeWorked.textContent = `${newHours}h ${newMinutes.toString().padStart(2, '0')}m`;
+        }
+        
+        function updateProjects() {
+            projects.forEach(project => {
+                if (project.status === 'active' && project.progress < 100) {
+                    project.progress += Math.random() > 0.8 ? 1 : 0;
+                    project.updated += 1;
+                }
+            });
+            
+            renderProjects();
+        }
+        
+        function renderProjects() {
+            const container = document.getElementById('project-list');
+            container.innerHTML = projects.map(project => `
+                <div class="project-item" data-project="${project.id}">
+                    <div class="project-header">
+                        <div class="project-name">${project.name}</div>
+                        <div class="project-status ${project.status}">${project.status === 'active' ? 'Em andamento' : 'Pausado'}</div>
+                    </div>
+                    <div class="project-progress">
+                        <div class="project-progress-bar" style="width: ${project.progress}%"></div>
+                    </div>
+                    
+                    <div class="project-meta">
+                        <span>${project.progress}% completo</span>
+                        <span class="project-updated">${project.updated === 0 ? 'Atualizado agora' : `Atualizado há ${project.updated} min`}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function updateTasks() {
+            tasks.forEach(task => {
+                task.time += 1;
+            });
+            
+            renderTasks();
+        }
+        
+        function renderTasks() {
+            const container = document.getElementById('task-list');
+            container.innerHTML = tasks.map(task => `
+                <div class="task-item" data-task="${task.id}">
+                    <div class="task-priority ${task.priority}"></div>
+                    <div class="task-content">
+                        <div class="task-title">${task.title}</div>
+                        <div class="task-meta">Projeto: ${task.project}</div>
+                    </div>
+                    <div class="task-time">${task.time}m</div>
+                </div>
+            `).join('');
+        }
+        
+        function toggleService() {
+            const services = document.querySelectorAll('.service-item');
+            const randomService = services[Math.floor(Math.random() * services.length)];
+            
+            if (Math.random() > 0.9) {
+                randomService.classList.toggle('online');
+                randomService.classList.toggle('offline');
                 
-                // Save to localStorage
-                saveBoardState();
-                updateCounts();
+                const statusText = randomService.querySelector('.service-status');
+                const isOnline = randomService.classList.contains('online');
+                statusText.innerHTML = `
+                    <div class="status-dot"></div>
+                    ${isOnline ? 'Online' : 'Offline'}
+                `;
+            }
+        }
+        
+        function addActivity() {
+            if (Math.random() > 0.95) {
+                const types = ['create', 'complete', 'move'];
+                const texts = [
+                    'Nova tarefa criada: "Testar integração"',
+                    'Tarefa concluída: "Revisar design"',
+                    'Projeto atualizado: "Landing Page"',
+                    'Novo commit enviado: "Fix bug #123"'
+                ];
                 
-                // Visual feedback
-                draggedCard.style.animation = 'none';
-                setTimeout(() => {
-                    draggedCard.style.animation = 'slideIn 0.3s ease';
-                }, 10);
+                const newActivity = {
+                    type: types[Math.floor(Math.random() * types.length)],
+                    text: texts[Math.floor(Math.random() * texts.length)],
+                    time: 0
+                };
+                
+                activities.unshift(newActivity);
+                if (activities.length > 10) activities.pop();
+                
+                renderActivities();
             }
         }
         
-        // Column Reordering
-        function handleColumnDragOver(e) {
-            e.preventDefault();
-            if (!draggedColumn) return;
+        function renderActivities() {
+            const container = document.getElementById('activity-log');
+            const icons = { create: '➕', complete: '✓', move: '↔', delete: '🗑' };
             
-            const columns = [...document.querySelectorAll('.column')];
-            const afterColumn = columns.find(col => {
-                const rect = col.getBoundingClientRect();
-                return e.clientX < rect.left + rect.width / 2;
-            });
-            
-            if (afterColumn) {
-                this.insertBefore(draggedColumn, afterColumn);
-            } else {
-                this.appendChild(draggedColumn);
-            }
-        }
-        
-        function handleColumnDrop(e) {
-            e.preventDefault();
-            saveBoardState();
-        }
-        
-        // Modal Functions
-        function openModal(columnId = 'todo') {
-            document.getElementById('modal').classList.add('active');
-            document.getElementById('taskColumn').value = columnId;
-            document.getElementById('taskTitle').focus();
-        }
-        
-        function closeModal() {
-            document.getElementById('modal').classList.remove('active');
-            document.getElementById('taskForm').reset();
-        }
-        
-        // Add Task
-        function addTask(e) {
-            e.preventDefault();
-            
-            const title = document.getElementById('taskTitle').value;
-            const priority = document.getElementById('taskPriority').value;
-            const columnId = document.getElementById('taskColumn').value;
-            
-            const priorityConfig = {
-                high: { color: 'priority-high', label: 'Alta' },
-                medium: { color: 'priority-medium', label: 'Média' },
-                low: { color: 'priority-low', label: 'Baixa' }
-            };
-            
-            const card = document.createElement('div');
-            card.className = 'card';
-            card.draggable = true;
-            card.dataset.id = Date.now();
-            card.innerHTML = `
-                <div class="card-header">
-                    <span class="card-title">${title}</span>
-                    <span class="card-drag-handle"><i class="fas fa-grip-vertical"></i></span>
+            container.innerHTML = activities.map(activity => `
+                <div class="activity-item">
+                    <div class="activity-icon ${activity.type}">${icons[activity.type]}</div>
+                    <div class="activity-content">
+                        <div class="activity-text">${activity.text}</div>
+                        <div class="activity-time">${activity.time === 0 ? 'Agora' : `Há ${activity.time} minutos`}</div>
+                    </div>
                 </div>
-                <div class="card-meta">
-                    <span class="card-meta-item priority ${priorityConfig[priority].color}">
-                        <i class="fas fa-flag"></i> ${priorityConfig[priority].label}
-                    </span>
-                    <span class="card-meta-item">
-                        <i class="fas fa-calendar"></i> ${new Date().toLocaleDateString('pt-BR')}
-                    </span>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: 0%"></div>
-                </div>
-            `;
+            `).join('');
             
-            card.addEventListener('dragstart', handleCardDragStart);
-            card.addEventListener('dragend', handleCardDragEnd);
-            
-            const column = document.getElementById(columnId);
-            const addBtn = column.querySelector('.add-card-btn');
-            column.insertBefore(card, addBtn);
-            
-            closeModal();
-            saveBoardState();
-            updateCounts();
+            document.getElementById('log-count').textContent = activities.length;
         }
         
-        // Update counts
-        function updateCounts() {
-            ['todo', 'progress', 'done', 'projects'].forEach(col => {
-                const count = document.querySelectorAll(`#${col} .card`).length;
-                document.getElementById(`count-${col}`).textContent = count;
-            });
-            
-            // Update stats
-            document.getElementById('statProjects').textContent = 
-                document.querySelectorAll('#projects .card').length;
-            document.getElementById('statTasks').textContent = 
-                document.querySelectorAll('#todo .card, #progress .card').length;
-        }
+        // Inicializa atualizações
+        setInterval(updateStats, 5000);
+        setInterval(updateProjects, 10000);
+        setInterval(updateTasks, 60000);
+        setInterval(toggleService, 15000);
+        setInterval(addActivity, 8000);
         
-        // Save/Load board state
-        function saveBoardState() {
-            const state = {};
-            document.querySelectorAll('.column').forEach(col => {
-                const colId = col.dataset.column;
-                const cards = [...col.querySelectorAll('.card')].map(card => ({
-                    id: card.dataset.id,
-                    title: card.querySelector('.card-title').textContent,
-                    html: card.innerHTML
-                }));
-                state[colId] = cards;
-            });
-            localStorage.setItem('openclaw-dashboard', JSON.stringify(state));
-        }
-        
-        function loadBoardState() {
-            const saved = localStorage.getItem('openclaw-dashboard');
-            if (!saved) return;
-            
-            const state = JSON.parse(saved);
-            // Restore logic here if needed
-        }
-        
-        // Refresh data
-        function refreshData() {
-            updateCounts();
-            document.getElementById('lastUpdate').textContent = 
-                'Atualizado: ' + new Date().toLocaleTimeString('pt-BR');
-        }
-        
-        // Close modal on overlay click
-        document.getElementById('modal').addEventListener('click', (e) => {
-            if (e.target.id === 'modal') closeModal();
-        });
-        
-        // Keyboard shortcuts
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeModal();
-            if (e.key === 'n' && e.ctrlKey) {
-                e.preventDefault();
-                openModal();
-            }
-        });
+        // Atualiza timestamps
+        setInterval(() => {
+            activities.forEach(a => a.time += 1);
+            renderActivities();
+        }, 60000);
     </script>
 </body>
 </html>
