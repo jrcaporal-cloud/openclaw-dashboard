@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenClaw Dashboard - Projetos em Tempo Real</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-card: rgba(30, 30, 45, 0.6);
+            --bg-glass: rgba(255, 255, 255, 0.03);
+            --border-glass: rgba(255, 255, 255, 0.08);
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --accent-primary: #6366f1;
+            --accent-secondary: #8b5cf6;
+            --accent-success: #10b981;
+            --accent-warning: #f59e0b;
+            --accent-danger: #ef4444;
+            --accent-info: #3b82f6;
+            --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            --gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            --gradient-warning: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            --shadow-glow: 0 0 30px rgba(99, 102, 241, 0.15);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Background Effects */
+        .bg-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            background: 
+                radial-gradient(ellipse at 20% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(16, 185, 129, 0.05) 0%, transparent 70%);
+        }
+
+        .bg-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+
+        /* Header */
+        .header {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-glass);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            box-shadow: var(--shadow-glow);
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .header-stat {
+            text-align: center;
+        }
+
+        .header-stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .header-stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--accent-success);
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent-success);
+            border-radius: 50%;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Grid Layout */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 1.5rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glass);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+        }
+
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .card-icon.purple { background: rgba(99, 102, 241, 0.2); }
+        .card-icon.blue { background: rgba(59, 130, 246, 0.2); }
+        .card-icon.green { background: rgba(16, 185, 129, 0.2); }
+        .card-icon.orange { background: rgba(245, 158, 11, 0.2); }
+        .card-icon.red { background: rgba(239, 68, 68, 0.2); }
+
+        /* Section Sizes */
+        .col-12 { grid-column: span 12; }
+        .col-8 { grid-column: span 8; }
+        .col-6 { grid-column: span 6; }
+        .col-4 { grid-column: span 4; }
+        .col-3 { grid-column: span 3; }
+
+        @media (max-width: 1200px) {
+            .col-8, .col-6, .col-4, .col-3 { grid-column: span 6; }
+        }
+
+        @media (max-width: 768px) {
+            .col-8, .col-6, .col-4, .col-3 { grid-column: span 12; }
+            .header-content { flex-direction: column; }
+            .header-stats { flex-wrap: wrap; justify-content: center; }
+        }
+
+        /* Projects Section */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        .project-card {
+            background: var(--bg-glass);
+            border: 1px solid var(--border-glass);
+            border-radius: 12px;
+            padding: 1.25rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--gradient-primary);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+        }
+
+        .project-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .project-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.75rem;
+        }
+
+        .project-name {
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--text-primary);
+        }
+
+        .project-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .status-active { background: rgba(16, 185, 129, 0.2); color: var(--accent-success); }
+        .status-paused { background: rgba(245, 158, 11, 0.2); color: var(--accent-warning); }
+        .status-completed { background: rgba(99, 102, 241, 0.2); color: var(--accent-primary); }
+
+        .project-progress {
+            margin: 1rem 0;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .progress-fill.green { background: var(--gradient-success); }
+        .progress-fill.blue { background: var(--gradient-primary); }
+        .progress-fill.orange { background: var(--gradient-warning); }
+
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.5rem;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .project-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--border-glass);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .project-timestamp {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        /* Tasks Section */
+        .tasks-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .task-item {
+            background: var(--bg-glass);
+            border: 1px solid var(--border-glass);
+            border-radius: 10px;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .task-item:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+            transform: translateX(4px);
+        }
+
+        .task-priority {
+            width: 4px;
+            height: 40px;
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+
+        .priority-high { background: var(--accent-danger); }
+        .priority-medium { background: var(--accent-warning); }
+        .priority-low { background: var(--accent-success); }
+
+        .task-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .task-title {
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .task-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .task-status {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.6875rem;
+            font-weight: 500;
+        }
+
+        .task-timer {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            background: rgba(99, 102, 241, 0.1);
+            border-radius: 8px;
+            font-family: 'SF Mono', monospace;
+            font-size: 0.875rem;
+            color: var(--accent-primary);
+            font-weight: 600;
+        }
+
+        .timer-icon {
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Activity Logs */
+        .logs-container {
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+        }
+
+        .logs-container::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .logs-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .logs-container::-webkit-scrollbar-thumb {
+            background: var(--border-glass);
+            border-radius: 2px;
+        }
+
+        .log-item {
+            display: flex;
+            gap: 1rem;
+            padding: 0.875rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .log-item:hover {
+            background: var(--bg-glass);
+        }
+
+        .log-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            flex-shrink: 0;
+        }
+
+        .log-icon.created { background: rgba(16, 185, 129, 0.2); }
+        .log-icon.completed { background: rgba(99, 102, 241, 0.2); }
+        .log-icon.moved { background: rgba(245, 158, 11, 0.2); }
+        .log-icon.updated { background: rgba(59, 130, 246, 0.2); }
+
+        .log-content {
+            flex: 1;
+        }
+
+        .log-text {
+            font-size: 0.875rem;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .log-text strong {
+            color: var(--accent-primary);
+            font-weight: 600;
+        }
+
+        .log-time {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Service Status */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+        }
+
+        .service-card {
+            background: var(--bg-glass);
+            border: 1px solid var(--border-glass);
+            border-radius: 12px;
+            padding: 1.25rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .service-card:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .service-status {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            margin: 0 auto 0.75rem;
+            position: relative;
+        }
+
+        .service-status.online {
+            background: var(--accent-success);
+            box-shadow: 0 0 10px var(--accent-success);
+            animation: blink 1.5s ease-in-out infinite;
+        }
+
+        .service-status.offline {
+            background: var(--text-muted);
+            box-shadow: none;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .service-name {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .service-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+
+        .stat-card {
+            background: var(--bg-glass);
+            border: 1px solid var(--border-glass);
+            border-radius: 12px;
+            padding: 1.25rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .stat-change {
+            font-size: 0.75rem;
+            margin-top: 0.5rem;
+            font-weight: 500;
+        }
+
+        .stat-change.positive { color: var(--accent-success); }
+        .stat-change.negative { color: var(--accent-danger); }
+
+        /* Quick Actions */
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+        }
+
+        .action-btn {
+            background: var(--bg-glass);
+            border: 1px solid var(--border-glass);
+            border-radius: 10px;
+            padding: 1rem;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .action-btn:hover {
+            background: rgba(99, 102, 241, 0.1);
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .container { padding: 1rem; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .actions-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-gradient"></div>
+    <div class="bg-grid"></div>
+
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">⚡</div>
+                <span class="logo-text">OpenClaw Dashboard</span>
+            </div>
+            <div class="header-stats">
+                <div class="header-stat">
+                    <div class="header-stat-value" id="total-projects">0</div>
+                    <div class="header-stat-label">Projetos</div>
+                </div>
+                <div class="header-stat">
+                    <div class="header-stat-value" id="active-tasks">0</div>
+                    <div class="header-stat-label">Tarefas Ativas</div>
+                </div>
+                <div class="header-stat">
+                    <div class="header-stat-value" id="completed-today">0</div>
+                    <div class="header-stat-label">Concluídas Hoje</div>
+                </div>
+                <div class="live-indicator">
+                    <span class="live-dot"></span>
+                    <span>AO VIVO</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="dashboard-grid">
+            <!-- Estatísticas ao Vivo -->
+            <div class="card col-12">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-tasks-today">0</div>
+                        <div class="stat-label">Tarefas Hoje</div>
+                        <div class="stat-change positive">+12% vs ontem</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-time-worked">00:00</div>
+                        <div class="stat-label">Tempo Trabalhado</div>
+                        <div class="stat-change positive">Meta: 8h</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-completed-hour">0</div>
+                        <div class="stat-label">Concluídas (1h)</div>
+                        <div class="stat-change positive">+3 vs última hora</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Projetos Ativos -->
+            <div class="card col-8">
+                <div class="card-header">
+                    <div class="card-title">
+                        <div class="card-icon purple">📁</div>
+                        Projetos Ativos
+                    </div>
+                </div>
+                <div class="projects-grid" id="projects-container">
+                    <!-- Projetos serão inseridos via JavaScript -->
+                </div>
+            </div>
+
+            <!-- Status de Serviços -->
+            <div class="card col-4">
+                <div class="card-header">
+                    <div class="card-title">
+                        <div class="card-icon green">🌐</div>
+                        Status dos Serviços
+                    </div>
+                </div>
+                <div class="services-grid" id="services-container">
+                    <!-- Serviços serão inseridos via JavaScript -->
+                </div>
+            </div>
+
+            <!-- Tarefas em Andamento -->
+            <div class="card col-6">
+                <div class="card-header">
+                    <div class="card-title">
+                        <div class="card-icon blue">✓</div>
+                        Tarefas em Andamento
+                    </div>
+                </div>
+                <div class="tasks-list" id="tasks-container">
+                    <!-- Tarefas serão inseridas via JavaScript -->
+                </div>
+            </div>
+
+            <!-- Logs de Atividades -->
+            <div class="card col-6">
+                <div class="card-header">
+                    <div class="card-title">
+                        <div class="card-icon orange">📋</div>
+                        Logs de Atividades
+                    </div>
+                </div>
+                <div class="logs-container" id="logs-container">
+                    <!-- Logs serão inseridos via JavaScript -->
+                </div>
+            </div>
+
+            <!-- Ações Rápidas -->
+            <div class="card col-12">
+                <div class="card-header">
+                    <div class="card-title">
+                        <div class="card-icon red">⚡</div>
+                        Ações Rápidas
+                    </div>
+                </div>
+                <div class="actions-grid">
+                    <button class="action-btn" onclick="addNewProject()">
+                        <span>➕</span> Novo Projeto
+                    </button>
+                    <button class="action-btn" onclick="addNewTask()">
+                        <span>📝</span> Nova Tarefa
+                    </button>
+                    <button class="action-btn" onclick="refreshData()">
+                        <span>🔄</span> Atualizar Dados
+                    </button>
+                    <button class="action-btn" onclick="exportReport()">
+                        <span>📊</span> Exportar Relatório
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Dados simulados
+        const mockData = {
+            projects: [
+                {
+                    id: 1,
+                    name: "Sistema de Automação WhatsApp",
+                    status: "active",
+                    progress: 78,
+                    lastUpdate: new Date(Date.now() - 5 * 60000),
+                    color: "green"
+                },
+                {
+                    id: 2,
+                    name: "Dashboard Analytics V2",
+                    status: "active",
+                    progress: 45,
+                    lastUpdate: new Date(Date.now() - 15 * 60000),
+                    color: "blue"
+                },
+                {
+                    id: 3,
+                    name: "API de Integração",
+                    status: "paused",
+                    progress: 62,
+                    lastUpdate: new Date(Date.now() - 2 * 60 * 60000),
+                    color: "orange"
+                },
+                {
+                    id: 4,
+                    name: "Documentação Técnica",
+                    status: "completed",
+                    progress: 100,
+                    lastUpdate: new Date(Date.now() - 24 * 60 * 60000),
+                    color: "green"
+                }
+            ],
+            tasks: [
+                {
+                    id: 1,
+                    title: "Implementar webhook de mensagens",
+                    priority: "high",
+                    status: "Em andamento",
+                    startTime: new Date(Date.now() - 45 * 60000),
+                    project: "Sistema WhatsApp"
+                },
+                {
+                    id: 2,
+                    title: "Criar componentes de gráficos",
+                    priority: "medium",
+                    status: "Em andamento",
+                    startTime: new Date(Date.now() - 120 * 60000),
+                    project: "Dashboard V2"
+                },
+                {
+                    id: 3,
+                    title: "Revisar código de autenticação",
+                    priority: "high",
+                    status: "Em andamento",
+                    startTime: new Date(Date.now() - 30 * 60000),
+                    project: "API Integração"
+                },
+                {
+                    id: 4,
+                    title: "Atualizar dependências",
+                    priority: "low",
+                    status: "Em andamento",
+                    startTime: new Date(Date.now() - 180 * 60000),
+                    project: "Manutenção"
+                }
+            ],
+            services: [
+                { name: "WhatsApp", status: "online", label: "Conectado" },
+                { name: "OpenClaw Gateway", status: "online", label: "Online" },
+                { name: "Cron Jobs", status: "online", label: "Ativo" },
+                { name: "Database", status: "online", label: "Online" },
+                { name: "Redis", status: "online", label: "Online" },
+                { name: "API Server", status: "online", label: "Online" }
+            ],
+            logs: [
+                { type: "created", text: "Nova tarefa criada: <strong>Implementar webhook</strong>", time: new Date(Date.now() - 2 * 60000) },
+                { type: "completed", text: "Tarefa concluída: <strong>Setup do projeto</strong>", time: new Date(Date.now() - 15 * 60000) },
+                { type: "moved", text: "Tarefa movida: <strong>Revisão de código</strong> → Em andamento", time: new Date(Date.now() - 30 * 60000) },
+                { type: "updated", text: "Projeto atualizado: <strong>Dashboard V2</strong> (45%)", time: new Date(Date.now() - 45 * 60000) },
+                { type: "created", text: "Novo projeto criado: <strong>API de Integração</strong>", time: new Date(Date.now() - 60 * 60000) },
+                { type: "completed", text: "Tarefa concluída: <strong>Design do banco</strong>", time: new Date(Date.now() - 90 * 60000) }
+            ]
+        };
+
+        // Estado da aplicação
+        let appState = {
+            projects: [...mockData.projects],
+            tasks: [...mockData.tasks],
+            services: [...mockData.services],
+            logs: [...mockData.logs],
+            totalWorkTime: 4 * 60 * 60 * 1000, // 4 horas em ms
+            tasksCompletedHour: 8,
+            tasksToday: 24
+        };
+
+        // Utilitários
+        function formatTime(date) {
+            return date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function formatDuration(ms) {
+            const hours = Math.floor(ms / (1000 * 60 * 60));
+            const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((ms % (1000 * 60)) / 1000);
+            return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function formatDurationShort(ms) {
+            const hours = Math.floor(ms / (1000 * 60 * 60));
+            const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
+            if (hours > 0) {
+                return `${hours}h ${minutes}m`;
+            }
+            return `${minutes}m`;
+        }
+
+        function timeAgo(date) {
+            const seconds = Math.floor((Date.now() - date) / 1000);
+            if (seconds < 60) return 'agora';
+            const minutes = Math.floor(seconds / 60);
+            if (minutes < 60) return `${minutes}min atrás`;
+            const hours = Math.floor(minutes / 60);
+            if (hours < 24) return `${hours}h atrás`;
+            return `${Math.floor(hours / 24)}d atrás`;
+        }
+
+        function getStatusLabel(status) {
+            const labels = {
+                active: 'Em andamento',
+                paused: 'Pausado',
+                completed: 'Concluído'
+            };
+            return labels[status] || status;
+        }
+
+        function getPriorityLabel(priority) {
+            const labels = {
+                high: 'Alta',
+                medium: 'Média',
+                low: 'Baixa'
+            };
+            return labels[priority] || priority;
+        }
+
+        // Renderização
+        function renderProjects() {
+            const container = document.getElementById('projects-container');
+            container.innerHTML = appState.projects.map(project => `
+                <div class="project-card">
+                    <div class="project-header">
+                        <span class="project-name">${project.name}</span>
+                        <span class="project-status status-${project.status}">${getStatusLabel(project.status)}</span>
+                    </div>
+                    <div class="project-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill ${project.color}" style="width: ${project.progress}%"></div>
+                        </div>
+                        <div class="progress-text">
+                            <span>Progresso</span>
+                            <span>${project.progress}%</span>
+                        </div>
+                    </div>
+                    <div class="project-meta">
+                        <span>⏱️ Atualizado</span>
+                        <span class="project-timestamp">${timeAgo(project.lastUpdate)}</span>
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('total-projects').textContent = appState.projects.length;
+        }
+
+        function renderTasks() {
+            const container = document.getElementById('tasks-container');
+            const now = Date.now();
+            
+            container.innerHTML = appState.tasks.map(task => {
+                const elapsed = now - task.startTime.getTime();
+                return `
+                    <div class="task-item">
+                        <div class="task-priority priority-${task.priority}"></div>
+                        <div class="task-content">
+                            <div class="task-title">${task.title}</div>
+                            <div class="task-meta">
+                                <span class="task-status">${task.status}</span>
+                                <span>📁 ${task.project}</span>
+                                <span>🔥 ${getPriorityLabel(task.priority)}</span>
+                            </div>
+                        </div>
+                        <div class="task-timer">
+                            <span class="timer-icon">⏱️</span>
+                            <span class="timer-value" data-start="${task.startTime.getTime()}">${formatDurationShort(elapsed)}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('active-tasks').textContent = appState.tasks.length;
+        }
+
+        function renderServices() {
+            const container = document.getElementById('services-container');
+            container.innerHTML = appState.services.map(service => `
+                <div class="service-card">
+                    <div class="service-status ${service.status}"></div>
+                    <div class="service-name">${service.name}</div>
+                    <div class="service-label">${service.label}</div>
+                </div>
+            `).join('');
+        }
+
+        function renderLogs() {
+            const container = document.getElementById('logs-container');
+            const icons = {
+                created: '➕',
+                completed: '✓',
+                moved: '↔️',
+                updated: '📝'
+            };
+
+            container.innerHTML = appState.logs.map(log => `
+                <div class="log-item">
+                    <div class="log-icon ${log.type}">${icons[log.type]}</div>
+                    <div class="log-content">
+                        <div class="log-text">${log.text}</div>
+                        <div class="log-time">${formatTime(log.time)} • ${timeAgo(log.time)}</div>
+                    </div>
+                </div>
+            `).join('');
+
+            // Auto-scroll para o topo (logs mais recentes)
+            container.scrollTop = 0;
+        }
+
+        function renderStats() {
+            document.getElementById('stat-tasks-today').textContent = appState.tasksToday;
+            document.getElementById('stat-time-worked').textContent = formatDurationShort(appState.totalWorkTime);
+            document.getElementById('stat-completed-hour').textContent = appState.tasksCompletedHour;
+            document.getElementById('completed-today').textContent = appState.tasksToday;
+        }
+
+        // Atualizações em tempo real
+        function updateTimers() {
+            const timerElements = document.querySelectorAll('.timer-value');
+            const now = Date.now();
+            
+            timerElements.forEach(el => {
+                const startTime = parseInt(el.dataset.start);
+                const elapsed = now - startTime;
+                el.textContent = formatDurationShort(elapsed);
+            });
+        }
+
+        function updateWorkTime() {
+            appState.totalWorkTime += 1000;
+            document.getElementById('stat-time-worked').textContent = formatDurationShort(appState.totalWorkTime);
+        }
+
+        // Simulação de atividades
+        function simulateActivity() {
+            const actions = [
+                () => {
+                    // Atualizar progresso de um projeto
+                    const project = appState.projects.find(p => p.status === 'active');
+                    if (project && project.progress < 100) {
+                        project.progress = Math.min(100, project.progress + Math.floor(Math.random() * 5) + 1);
+                        project.lastUpdate = new Date();
+                        if (project.progress === 100) {
+                            project.status = 'completed';
+                            addLog('completed', `Projeto concluído: <strong>${project.name}</strong>`);
+                        } else {
+                            addLog('updated', `Projeto atualizado: <strong>${project.name}</strong> (${project.progress}%)`);
+                        }
+                        renderProjects();
+                    }
+                },
+                () => {
+                    // Adicionar nova tarefa
+                    if (Math.random() > 0.7) {
+                        const newTask = {
+                            id: Date.now(),
+                            title: `Tarefa ${appState.tasks.length + 1}: ${['Revisar', 'Implementar', 'Testar', 'Documentar'][Math.floor(Math.random() * 4)]} ${['módulo', 'função', 'componente', 'endpoint'][Math.floor(Math.random() * 4)]}`,
+                            priority: ['high', 'medium', 'low'][Math.floor(Math.random() * 3)],
+                            status: 'Em andamento',
+                            startTime: new Date(),
+                            project: appState.projects[Math.floor(Math.random() * appState.projects.length)].name
+                        };
+                        appState.tasks.push(newTask);
+                        appState.tasksToday++;
+                        addLog('created', `Nova tarefa criada: <strong>${newTask.title}</strong>`);
+                        renderTasks();
+                        renderStats();
+                    }
+                },
+                () => {
+                    // Completar tarefa
+                    if (appState.tasks.length > 2 && Math.random() > 0.6) {
+                        const taskIndex = Math.floor(Math.random() * appState.tasks.length);
+                        const task = appState.tasks[taskIndex];
+                        appState.tasks.splice(taskIndex, 1);
+                        appState.tasksCompletedHour++;
+                        addLog('completed', `Tarefa concluída: <strong>${task.title}</strong>`);
+                        renderTasks();
+                        renderStats();
+                    }
+                }
+            ];
+
+            // Executar ação aleatória
+            const action = actions[Math.floor(Math.random() * actions.length)];
+            action();
+        }
+
+        function addLog(type, text) {
+            appState.logs.unshift({
+                type,
+                text,
+                time: new Date()
+            });
+            // Manter apenas os últimos 20 logs
+            if (appState.logs.length > 20) {
+                appState.logs = appState.logs.slice(0, 20);
+            }
+            renderLogs();
+        }
+
+        // Ações dos botões
+        function addNewProject() {
+            const names = ['Integração Slack', 'Mobile App', 'Backup Automático', 'Relatórios PDF'];
+            const newProject = {
+                id: Date.now(),
+                name: names[Math.floor(Math.random() * names.length)],
+                status: 'active',
+                progress: 0,
+                lastUpdate: new Date(),
+                color: ['green', 'blue', 'orange'][Math.floor(Math.random() * 3)]
+            };
+            appState.projects.push(newProject);
+            addLog('created', `Novo projeto criado: <strong>${newProject.name}</strong>`);
+            renderProjects();
+        }
+
+        function addNewTask() {
+            const priorities = ['high', 'medium', 'low'];
+            const newTask = {
+                id: Date.now(),
+                title: `Nova Tarefa ${Date.now().toString().slice(-4)}`,
+                priority: priorities[Math.floor(Math.random() * priorities.length)],
+                status: 'Em andamento',
+                startTime: new Date(),
+                project: appState.projects[Math.floor(Math.random() * appState.projects.length)].name
+            };
+            appState.tasks.push(newTask);
+            appState.tasksToday++;
+            addLog('created', `Nova tarefa criada: <strong>${newTask.title}</strong>`);
+            renderTasks();
+            renderStats();
+        }
+
+        function refreshData() {
+            addLog('updated', 'Dados atualizados manualmente');
+            renderProjects();
+            renderTasks();
+            renderServices();
+            renderLogs();
+            renderStats();
+        }
+
+        function exportReport() {
+            addLog('updated', 'Relatório exportado com sucesso');
+            alert('Relatório exportado! (Simulação)');
+        }
+
+        // Inicialização
+        function init() {
+            renderProjects();
+            renderTasks();
+            renderServices();
+            renderLogs();
+            renderStats();
+
+            // Atualizar timers a cada segundo
+            setInterval(updateTimers, 1000);
+
+            // Atualizar tempo trabalhado
+            setInterval(updateWorkTime, 1000);
+
+            // Simular atividades a cada 30 segundos
+            setInterval(simulateActivity, 30000);
+
+            // Atualizar status de serviços aleatoriamente
+            setInterval(() => {
+                if (Math.random() > 0.9) {
+                    const service = appState.services[Math.floor(Math.random() * appState.services.length)];
+                    service.status = service.status === 'online' ? 'offline' : 'online';
+                    service.label = service.status === 'online' ? 'Online' : 'Offline';
+                    renderServices();
+                }
+            }, 10000);
+        }
+
+        // Iniciar quando DOM estiver pronto
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
