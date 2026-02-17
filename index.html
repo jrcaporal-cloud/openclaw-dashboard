@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenClaw Dashboard - Drag & Drop</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --bg-hover: #2d333b;
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+            --accent: #58a6ff;
+            --accent-hover: #79c0ff;
+            --success: #238636;
+            --success-light: #3fb950;
+            --warning: #d29922;
+            --warning-light: #e3b341;
+            --danger: #da3633;
+            --danger-light: #f85149;
+            --border: #30363d;
+            --border-hover: #8b949e;
+            --shadow: 0 4px 12px rgba(0,0,0,0.4);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.5);
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.5;
+        }
+        
+        /* Header */
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+        
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--success-light);
+            animation: pulse 2s infinite;
+            box-shadow: 0 0 8px var(--success-light);
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(0.9); }
+        }
+        
+        .btn {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 0.625rem 1.25rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s ease;
+        }
+        
+        .btn:hover {
+            background: var(--bg-hover);
+            border-color: var(--border-hover);
+            transform: translateY(-1px);
+        }
+        
+        .btn-primary {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+        }
+        
+        .btn-primary:hover {
+            background: var(--accent-hover);
+        }
+        
+        .btn-success {
+            background: var(--success);
+            border-color: var(--success);
+            color: #fff;
+        }
+        
+        /* Container */
+        .container {
+            padding: 2rem;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        
+        /* Board Layout */
+        .board {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+            align-items: start;
+        }
+        
+        /* Column */
+        .column {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            min-height: 200px;
+            transition: all 0.3s ease;
+        }
+        
+        .column.drag-over {
+            border-color: var(--accent);
+            background: rgba(88, 166, 255, 0.05);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .column-header {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: grab;
+            user-select: none;
+            background: var(--bg-tertiary);
+            border-radius: 12px 12px 0 0;
+        }
+        
+        .column-header:active {
+            cursor: grabbing;
+        }
+        
+        .column-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 600;
+            font-size: 0.9375rem;
+        }
+        
+        .column-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+        
+        .column-count {
+            background: var(--bg-secondary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+        
+        .column-content {
+            padding: 1rem;
+            min-height: 150px;
+        }
+        
+        /* Cards */
+        .card {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            cursor: grab;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        
+        .card:hover {
+            border-color: var(--border-hover);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+        
+        .card.dragging {
+            opacity: 0.5;
+            cursor: grabbing;
+            transform: rotate(2deg);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.75rem;
+        }
+        
+        .card-title {
+            font-weight: 600;
+            font-size: 0.9375rem;
+            line-height: 1.4;
+            flex: 1;
+            margin-right: 0.5rem;
+        }
+        
+        .card-drag-handle {
+            color: var(--text-secondary);
+            cursor: grab;
+            padding: 0.25rem;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        
+        .card:hover .card-drag-handle {
+            opacity: 1;
+        }
+        
+        .card-drag-handle:hover {
+            color: var(--text-primary);
+        }
+        
+        .card-meta {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+        
+        .card-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+        
+        /* Badges */
+        .badge {
+            padding: 0.25rem 0.625rem;
+            border-radius: 20px;
+            font-size: 0.6875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+        
+        .badge-success { background: rgba(35, 134, 54, 0.2); color: var(--success-light); }
+        .badge-warning { background: rgba(210, 153, 34, 0.2); color: var(--warning-light); }
+        .badge-danger { background: rgba(218, 54, 51, 0.2); color: var(--danger-light); }
+        .badge-info { background: rgba(88, 166, 255, 0.2); color: var(--accent); }
+        .badge-neutral { background: var(--bg-secondary); color: var(--text-secondary); }
+        
+        /* Progress Bar */
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: var(--bg-secondary);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 0.75rem;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--accent-hover));
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+        
+        /* Priority Indicators */
+        .priority {
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .priority-high { color: var(--danger-light); }
+        .priority-medium { color: var(--warning-light); }
+        .priority-low { color: var(--success-light); }
+        
+        /* Add Button */
+        .add-card-btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: transparent;
+            border: 2px dashed var(--border);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        .add-card-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: rgba(88, 166, 255, 0.05);
+        }
+        
+        /* Stats Overview */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: all 0.2s;
+        }
+        
+        .stat-card:hover {
+            border-color: var(--border-hover);
+            transform: translateY(-2px);
+        }
+        
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .stat-info h3 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        
+        .stat-info p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+        
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.25rem;
+        }
+        
+        .modal-close:hover {
+            color: var(--text-primary);
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+        }
+        
+        .form-input, .form-select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.9375rem;
+            transition: all 0.2s;
+        }
+        
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: flex-end;
+            margin-top: 1.5rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .stats-bar {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+            
+            .stats-bar {
+                grid-template-columns: 1fr;
+            }
+            
+            .board {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Animations */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .card {
+            animation: slideIn 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>🐾 OpenClaw Dashboard</h1>
+        <div class="header-actions">
+            <div class="status-indicator">
+                <span class="status-dot"></span>
+                <span id="lastUpdate">Atualizado agora</span>
+            </div>
+            <button class="btn" onclick="refreshData()">
+                <i class="fas fa-sync-alt"></i> Atualizar
+            </button>
+            <button class="btn btn-primary" onclick="openModal()">
+                <i class="fas fa-plus"></i> Nova Tarefa
+            </button>
+        </div>
+    </header>
+    
+    <main class="container">
+        <!-- Stats Overview -->
+        <div class="stats-bar">
+            <div class="stat-card">
+                <div class="stat-icon">🚀</div>
+                <div class="stat-info">
+                    <h3 id="statProjects">2</h3>
+                    <p>Projetos Ativos</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">✅</div>
+                <div class="stat-info">
+                    <h3 id="statTasks">3</h3>
+                    <p>Tarefas Pendentes</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">💻</div>
+                <div class="stat-info">
+                    <h3 id="statSessions">1</h3>
+                    <p>Sessões Ativas</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">⏰</div>
+                <div class="stat-info">
+                    <h3 id="statCron">1</h3>
+                    <p>Cron Jobs</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Kanban Board -->
+        <div class="board" id="board">
+            <!-- Column: A Fazer -->
+            <div class="column" data-column="todo">
+                <div class="column-header" draggable="true">
+                    <div class="column-title">
+                        <div class="column-icon">📋</div>
+                        <span>A Fazer</span>
+                    </div>
+                    <span class="column-count" id="count-todo">2</span>
+                </div>
+                <div class="column-content" id="todo">
+                    <div class="card" draggable="true" data-id="1">
+                        <div class="card-header">
+                            <span class="card-title">Configurar WhatsApp</span>
+                            <span class="card-drag-handle"><i class="fas fa-grip-vertical"></i></span>
+                        </div>
+                        <div class="card-meta">
+                            <span class="card-meta-item priority priority-medium">
+                                <i class="fas fa-flag"></i> Média
+                            </span>
+                            <span class="card-meta-item">
+                                <i class="fas fa-calendar"></i> 17/02
+                            </span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 60%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="card" draggable="true" data-id="2">
+                        <div class="card-header">
+                            <span class="card-title">Revisar cron jobs</span>
+                            <span class="card-drag-handle"><i class="fas fa-grip-vertical"></i></span>
+                        </div>
+                        <div class="card-meta">
+                            <span class="card-meta-item priority priority-low">
+                                <i class="fas fa-flag"></i> Baixa
+                            </span>
+                            <span class="card-meta-item">
+                                <i class="fas fa-calendar"></i> 17/02
+                            </span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <button class="add-card-btn" onclick="openModal('todo')">
+                        <i class="fas fa-plus"></i> Adicionar tarefa
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Column: Em Progresso -->
+            <div class="column" data-column="progress">
+                <div class="column-header" draggable="true">
+                    <div class="column-title">
+                        <div class="column-icon" style="color: var(--warning-light)">⚡</div>
+                        <span>Em Progresso</span>
+                    </div>
+                    <span class="column-count" id="count-progress">1</span>
+                </div>
+                <div class="column-content" id="progress">
+                    <div class="card" draggable="true" data-id="3">
+                        <div class="card-header">
+                            <span class="card-title">Criar dashboard HTML</span>
+                            <span class="card-drag-handle"><i class="fas fa-grip-vertical"></i></span>
+                        </div>
+                        <div class="card-meta">
+                            <span class="card-meta-item priority priority-high">
+                                <i class="fas fa-flag"></i> Alta
+                            </span>
+                            <span class="card-meta-item">
+                                <i class="fas fa-calendar"></i> 17/02
+                            </span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 80%"></div>
+                        </div>
+                    </div>
+                    
+                    <button class="add-card-btn" onclick="openModal('progress')">
+                        <i class="fas fa-plus"></i> Adicionar tarefa
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Column: Concluído -->
+            <div class="column" data-column="done">
+                <div class="column-header" draggable="true">
+                    <div class="column-title">
+                        <div class="column-icon" style="color: var(--success-light)">✅</div>
+                        <span>Concluído</span>
+                    </div>
+                    <span class="column-count" id="count-done">1</span>
+                </div>
+                <div class="column-content" id="done">
+                    <div class="card" draggable="true" data-id="4">
+                        <div class="card-header">
+                            <span class="card-title">Setup inicial OpenClaw</span>
+                            <span class="card-drag-handle"><i class="fas fa-grip-vertical"></i></span>
+                        </div>
+                        <div class="card-meta">
+                            <span class="badge badge-success">Concluído</span>
+                            <span class="card-meta-item">
+                                <i class="fas fa-check-circle"></i> 16/02
+                            </span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 100%"></div>
+                        </div>
+                    </div>
+                    
+                    <button class="add-card-btn" onclick="openModal('done')">
+                        <i class="fas fa-plus"></i> Adicionar tarefa
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Column: Projetos -->
+            <div class="column" data-column="projects">
+                <div class="column-header" draggable="true">
+                    <div class="column-title">
+                        <div class="column-icon" style="color: var(--accent)">🚀</div>
+                        <span>Projetos</span>
+                    </div>
+                    <span class="column-count" id="count-projects">2</span>
+                </div>
+                <div class="column-content" id="projects">
+                    <div class="card" draggable="true" data-id="5">
+                        <div class="card-header">
+                            <span class="card-title">Dashboard OpenClaw</span>
+                            <span class="card-drag-handle"><i class="fas fa-grip-vertical"></i></span>
+                        </div>
+                        <div class="card-meta">
+                            <span class="badge badge-info">Em andamento</span>
+                            <span class="card-meta-item">
+                                <i class="fas fa-percentage"></i> 80%
+                            </span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 80%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="card" draggable="true" data-id="6">
+                        <div class="card-header">
+                            <span class="card-title">Integração WhatsApp</span>
+                            <span class="card-drag-handle"><i class="fas fa-grip-vertical"></i></span>
+                        </div>
+                        <div class="card-meta">
+                            <span class="badge badge-warning">Pendente</span>
+                            <span class="card-meta-item">
+                                <i class="fas fa-percentage"></i> 60%
+                            </span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 60%"></div>
+                        </div>
+                    </div>
+                    
+                    <button class="add-card-btn" onclick="openModal('projects')">
+                        <i class="fas fa-plus"></i> Adicionar projeto
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Modal -->
+    <div class="modal-overlay" id="modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Nova Tarefa</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="taskForm" onsubmit="addTask(event)">
+                <div class="form-group">
+                    <label class="form-label">Título</label>
+                    <input type="text" class="form-input" id="taskTitle" placeholder="Nome da tarefa" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Prioridade</label>
+                    <select class="form-select" id="taskPriority">
+                        <option value="high">Alta</option>
+                        <option value="medium" selected>Média</option>
+                        <option value="low">Baixa</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Coluna</label>
+                    <select class="form-select" id="taskColumn">
+                        <option value="todo">A Fazer</option>
+                        <option value="progress">Em Progresso</option>
+                        <option value="done">Concluído</option>
+                        <option value="projects">Projetos</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn" onclick="closeModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Adicionar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        // Drag and Drop functionality
+        let draggedCard = null;
+        let draggedColumn = null;
+        
+        // Initialize drag and drop
+        document.addEventListener('DOMContentLoaded', () => {
+            initDragAndDrop();
+            updateCounts();
+        });
+        
+        function initDragAndDrop() {
+            // Card drag and drop
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                card.addEventListener('dragstart', handleCardDragStart);
+                card.addEventListener('dragend', handleCardDragEnd);
+            });
+            
+            // Column drop zones
+            const columns = document.querySelectorAll('.column-content');
+            columns.forEach(column => {
+                column.addEventListener('dragover', handleDragOver);
+                column.addEventListener('drop', handleDrop);
+                column.addEventListener('dragleave', handleDragLeave);
+            });
+            
+            // Column reordering
+            const columnHeaders = document.querySelectorAll('.column-header');
+            columnHeaders.forEach(header => {
+                header.addEventListener('dragstart', handleColumnDragStart);
+                header.addEventListener('dragend', handleColumnDragEnd);
+            });
+            
+            const board = document.getElementById('board');
+            board.addEventListener('dragover', handleColumnDragOver);
+            board.addEventListener('drop', handleColumnDrop);
+        }
+        
+        // Card Drag Handlers
+        function handleCardDragStart(e) {
+            draggedCard = this;
+            this.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', this.dataset.id);
+        }
+        
+        function handleCardDragEnd(e) {
+            this.classList.remove('dragging');
+            draggedCard = null;
+            document.querySelectorAll('.column').forEach(col => {
+                col.classList.remove('drag-over');
+            });
+        }
+        
+        // Column Drag Handlers
+        function handleColumnDragStart(e) {
+            draggedColumn = this.parentElement;
+            this.style.opacity = '0.5';
+            e.dataTransfer.effectAllowed = 'move';
+        }
+        
+        function handleColumnDragEnd(e) {
+            this.style.opacity = '1';
+            draggedColumn = null;
+        }
+        
+        // Drop Handlers
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            
+            const column = this.closest('.column');
+            column.classList.add('drag-over');
+            
+            // Auto-scroll when dragging near edges
+            const rect = this.getBoundingClientRect();
+            const offset = e.clientY - rect.top;
+            
+            if (offset < 50) {
+                this.scrollTop -= 10;
+            } else if (offset > rect.height - 50) {
+                this.scrollTop += 10;
+            }
+        }
+        
+        function handleDragLeave(e) {
+            const column = this.closest('.column');
+            column.classList.remove('drag-over');
+        }
+        
+        function handleDrop(e) {
+            e.preventDefault();
+            const column = this.closest('.column');
+            column.classList.remove('drag-over');
+            
+            if (draggedCard) {
+                // Insert before the "Add" button
+                const addBtn = this.querySelector('.add-card-btn');
+                this.insertBefore(draggedCard, addBtn);
+                
+                // Save to localStorage
+                saveBoardState();
+                updateCounts();
+                
+                // Visual feedback
+                draggedCard.style.animation = 'none';
+                setTimeout(() => {
+                    draggedCard.style.animation = 'slideIn 0.3s ease';
+                }, 10);
+            }
+        }
+        
+        // Column Reordering
+        function handleColumnDragOver(e) {
+            e.preventDefault();
+            if (!draggedColumn) return;
+            
+            const columns = [...document.querySelectorAll('.column')];
+            const afterColumn = columns.find(col => {
+                const rect = col.getBoundingClientRect();
+                return e.clientX < rect.left + rect.width / 2;
+            });
+            
+            if (afterColumn) {
+                this.insertBefore(draggedColumn, afterColumn);
+            } else {
+                this.appendChild(draggedColumn);
+            }
+        }
+        
+        function handleColumnDrop(e) {
+            e.preventDefault();
+            saveBoardState();
+        }
+        
+        // Modal Functions
+        function openModal(columnId = 'todo') {
+            document.getElementById('modal').classList.add('active');
+            document.getElementById('taskColumn').value = columnId;
+            document.getElementById('taskTitle').focus();
+        }
+        
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+            document.getElementById('taskForm').reset();
+        }
+        
+        // Add Task
+        function addTask(e) {
+            e.preventDefault();
+            
+            const title = document.getElementById('taskTitle').value;
+            const priority = document.getElementById('taskPriority').value;
+            const columnId = document.getElementById('taskColumn').value;
+            
+            const priorityConfig = {
+                high: { color: 'priority-high', label: 'Alta' },
+                medium: { color: 'priority-medium', label: 'Média' },
+                low: { color: 'priority-low', label: 'Baixa' }
+            };
+            
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.draggable = true;
+            card.dataset.id = Date.now();
+            card.innerHTML = `
+                <div class="card-header">
+                    <span class="card-title">${title}</span>
+                    <span class="card-drag-handle"><i class="fas fa-grip-vertical"></i></span>
+                </div>
+                <div class="card-meta">
+                    <span class="card-meta-item priority ${priorityConfig[priority].color}">
+                        <i class="fas fa-flag"></i> ${priorityConfig[priority].label}
+                    </span>
+                    <span class="card-meta-item">
+                        <i class="fas fa-calendar"></i> ${new Date().toLocaleDateString('pt-BR')}
+                    </span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 0%"></div>
+                </div>
+            `;
+            
+            card.addEventListener('dragstart', handleCardDragStart);
+            card.addEventListener('dragend', handleCardDragEnd);
+            
+            const column = document.getElementById(columnId);
+            const addBtn = column.querySelector('.add-card-btn');
+            column.insertBefore(card, addBtn);
+            
+            closeModal();
+            saveBoardState();
+            updateCounts();
+        }
+        
+        // Update counts
+        function updateCounts() {
+            ['todo', 'progress', 'done', 'projects'].forEach(col => {
+                const count = document.querySelectorAll(`#${col} .card`).length;
+                document.getElementById(`count-${col}`).textContent = count;
+            });
+            
+            // Update stats
+            document.getElementById('statProjects').textContent = 
+                document.querySelectorAll('#projects .card').length;
+            document.getElementById('statTasks').textContent = 
+                document.querySelectorAll('#todo .card, #progress .card').length;
+        }
+        
+        // Save/Load board state
+        function saveBoardState() {
+            const state = {};
+            document.querySelectorAll('.column').forEach(col => {
+                const colId = col.dataset.column;
+                const cards = [...col.querySelectorAll('.card')].map(card => ({
+                    id: card.dataset.id,
+                    title: card.querySelector('.card-title').textContent,
+                    html: card.innerHTML
+                }));
+                state[colId] = cards;
+            });
+            localStorage.setItem('openclaw-dashboard', JSON.stringify(state));
+        }
+        
+        function loadBoardState() {
+            const saved = localStorage.getItem('openclaw-dashboard');
+            if (!saved) return;
+            
+            const state = JSON.parse(saved);
+            // Restore logic here if needed
+        }
+        
+        // Refresh data
+        function refreshData() {
+            updateCounts();
+            document.getElementById('lastUpdate').textContent = 
+                'Atualizado: ' + new Date().toLocaleTimeString('pt-BR');
+        }
+        
+        // Close modal on overlay click
+        document.getElementById('modal').addEventListener('click', (e) => {
+            if (e.target.id === 'modal') closeModal();
+        });
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+            if (e.key === 'n' && e.ctrlKey) {
+                e.preventDefault();
+                openModal();
+            }
+        });
+    </script>
+</body>
+</html>
