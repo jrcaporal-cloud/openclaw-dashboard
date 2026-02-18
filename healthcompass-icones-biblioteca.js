@@ -3,34 +3,42 @@
 // Fonte: https://icones.js.org
 // Estilo: Outline (linhas, sem preenchimento)
 // Bibliotecas: Lucide + Healthicons + Tabler
+// Total: 115 ícones em 20 categorias
 // ============================================================
 
 // ============================================================
-// 1. SAÚDE GERAL
+// 1. SAÚDE GERAL (EXPANDIDO)
 // ============================================================
 { icon: 'healthicons:heart-organ', name: 'Coração', cat: 'saude_geral' },
 { icon: 'healthicons:stethoscope', name: 'Estetoscópio', cat: 'saude_geral' },
 { icon: 'healthicons:medicines', name: 'Medicamentos', cat: 'saude_geral' },
 { icon: 'lucide:activity', name: 'Atividade', cat: 'saude_geral' },
 { icon: 'healthicons:thermometer', name: 'Termômetro', cat: 'saude_geral' },
+{ icon: 'lucide:pill', name: 'Comprimido', cat: 'saude_geral' },
+{ icon: 'lucide:syringe', name: 'Seringa', cat: 'saude_geral' },
 
 // ============================================================
-// 2. NUTRIÇÃO E ALIMENTAÇÃO
+// 2. NUTRIÇÃO E ALIMENTAÇÃO (EXPANDIDO)
 // ============================================================
 { icon: 'lucide:apple', name: 'Maçã', cat: 'nutricao_alimentacao' },
 { icon: 'lucide:carrot', name: 'Cenoura', cat: 'nutricao_alimentacao' },
 { icon: 'lucide:utensils', name: 'Talheres', cat: 'nutricao_alimentacao' },
 { icon: 'lucide:droplets', name: 'Hidratação', cat: 'nutricao_alimentacao' },
 { icon: 'lucide:scale', name: 'Balança', cat: 'nutricao_alimentacao' },
+{ icon: 'lucide:flame', name: 'Calorias', cat: 'nutricao_alimentacao' },
+{ icon: 'lucide:chef-hat', name: 'Chef', cat: 'nutricao_alimentacao' },
 
 // ============================================================
-// 3. ATIVIDADE FÍSICA E EXERCÍCIO
+// 3. ATIVIDADE FÍSICA E EXERCÍCIO (EXPANDIDO)
 // ============================================================
 { icon: 'tabler:run', name: 'Corrida', cat: 'atividade_fisica' },
 { icon: 'lucide:dumbbell', name: 'Haltere', cat: 'atividade_fisica' },
 { icon: 'tabler:walk', name: 'Caminhada', cat: 'atividade_fisica' },
 { icon: 'lucide:bike', name: 'Bicicleta', cat: 'atividade_fisica' },
 { icon: 'tabler:swimming', name: 'Natação', cat: 'atividade_fisica' },
+{ icon: 'lucide:mountain', name: 'Montanha', cat: 'atividade_fisica' },
+{ icon: 'lucide:footprints', name: 'Passos', cat: 'atividade_fisica' },
+{ icon: 'lucide:zap', name: 'Energia', cat: 'atividade_fisica' },
 
 // ============================================================
 // 4. METAS E PROGRESSO
@@ -96,13 +104,15 @@
 { icon: 'lucide:microscope', name: 'Microscópio', cat: 'analises_exames' },
 
 // ============================================================
-// 11. SINTOMAS E QUEIXAS
+// 11. SINTOMAS E QUEIXAS (EXPANDIDO)
 // ============================================================
 { icon: 'healthicons:virus', name: 'Vírus', cat: 'sintomas_queixas' },
 { icon: 'healthicons:bandage', name: 'Curativo', cat: 'sintomas_queixas' },
 { icon: 'lucide:thermometer', name: 'Febre', cat: 'sintomas_queixas' },
 { icon: 'healthicons:coughing', name: 'Tosse', cat: 'sintomas_queixas' },
 { icon: 'healthicons:headache', name: 'Dor de Cabeça', cat: 'sintomas_queixas' },
+{ icon: 'lucide:frown', name: 'Indisposição', cat: 'sintomas_queixas' },
+{ icon: 'lucide:nausea', name: 'Náusea', cat: 'sintomas_queixas' },
 
 // ============================================================
 // 12. HÁBITOS E COMPORTAMENTO
@@ -150,13 +160,18 @@
 { icon: 'lucide:x', name: 'Fechar', cat: 'navegacao_interface' },
 
 // ============================================================
-// 17. ALIMENTOS ESPECÍFICOS
+// 17. ALIMENTOS ESPECÍFICOS (EXPANDIDO)
 // ============================================================
 { icon: 'lucide:beef', name: 'Carne', cat: 'alimentos_especificos' },
 { icon: 'lucide:fish', name: 'Peixe', cat: 'alimentos_especificos' },
 { icon: 'lucide:wheat', name: 'Trigo', cat: 'alimentos_especificos' },
 { icon: 'lucide:milk', name: 'Leite', cat: 'alimentos_especificos' },
 { icon: 'lucide:cherry', name: 'Fruta', cat: 'alimentos_especificos' },
+{ icon: 'lucide:egg', name: 'Ovo', cat: 'alimentos_especificos' },
+{ icon: 'lucide:cookie', name: 'Biscoito', cat: 'alimentos_especificos' },
+{ icon: 'lucide:croissant', name: 'Pão', cat: 'alimentos_especificos' },
+{ icon: 'lucide:salad', name: 'Salada', cat: 'alimentos_especificos' },
+{ icon: 'lucide:soup', name: 'Sopa', cat: 'alimentos_especificos' },
 
 // ============================================================
 // 18. RESTRIÇÕES ALIMENTARES
