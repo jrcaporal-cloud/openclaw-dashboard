@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rinaldo Caporal — Assessoria Nutricional</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #111111;
+            --bg-tertiary: #1a1a1a;
+            --text-primary: #ffffff;
+            --text-secondary: #888888;
+            --text-muted: #555555;
+            --accent: #c9a96e;
+            --accent-light: #e8d5b5;
+            --border: #222222;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        /* Loader */
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.8s ease, visibility 0.8s;
+        }
+        
+        .loader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        .loader-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-weight: 400;
+            letter-spacing: 0.3em;
+            color: var(--accent);
+            animation: loaderPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes loaderPulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+        
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 30px 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            transition: all 0.4s ease;
+        }
+        
+        nav.scrolled {
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 20px 60px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .nav-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-decoration: none;
+            letter-spacing: 0.1em;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 40px;
+            list-style: none;
+        }
+        
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+        
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--accent);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+            color: var(--text-primary);
+        }
+        
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+        
+        /* Hero */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 120px 40px 80px;
+            position: relative;
+        }
+        
+        .hero-label {
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 30px;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeUp 1s ease forwards 0.5s;
+        }
+        
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 400;
+            line-height: 1.1;
+            margin-bottom: 30px;
+            opacity: 0;
+            transform: translateY(40px);
+            animation: fadeUp 1s ease forwards 0.7s;
+        }
+        
+        .hero h1 em {
+            font-style: italic;
+            color: var(--accent);
+        }
+        
+        .hero-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            max-width: 500px;
+            margin-bottom: 50px;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeUp 1s ease forwards 0.9s;
+        }
+        
+        .hero-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+            padding: 18px 40px;
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            transition: all 0.4s ease;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeUp 1s ease forwards 1.1s;
+        }
+        
+        .hero-cta:hover {
+            background: var(--accent);
+            color: var(--bg-primary);
+        }
+        
+        .hero-cta svg {
+            transition: transform 0.3s ease;
+        }
+        
+        .hero-cta:hover svg {
+            transform: translateX(5px);
+        }
+        
+        .scroll-indicator {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            opacity: 0;
+            animation: fadeIn 1s ease forwards 1.5s;
+        }
+        
+        .scroll-line {
+            width: 1px;
+            height: 60px;
+            background: linear-gradient(to bottom, var(--accent), transparent);
+            animation: scrollLine 2s ease-in-out infinite;
+        }
+        
+        @keyframes scrollLine {
+            0%, 100% { transform: scaleY(0); transform-origin: top; }
+            50% { transform: scaleY(1); transform-origin: top; }
+            51% { transform-origin: bottom; }
+            100% { transform: scaleY(0); transform-origin: bottom; }
+        }
+        
+        @keyframes fadeUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+        
+        /* Stats Section */
+        .stats-section {
+            padding: 100px 60px;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 60px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .stat-item {
+            text-align: center;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        
+        .stat-item.visible {
+            animation: fadeUp 0.8s ease forwards;
+        }
+        
+        .stat-number {
+            font-family: 'Playfair Display', serif;
+            font-size: 4rem;
+            font-weight: 400;
+            color: var(--accent);
+            margin-bottom: 10px;
+        }
+        
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+        
+        /* Content Section */
+        .content-section {
+            padding: 120px 60px;
+        }
+        
+        .section-header {
+            margin-bottom: 80px;
+        }
+        
+        .section-label {
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 20px;
+        }
+        
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 400;
+            line-height: 1.2;
+        }
+        
+        /* Video Section */
+        .video-section {
+            padding: 100px 60px;
+            background: var(--bg-secondary);
+        }
+        
+        .video-container {
+            max-width: 800px;
+            margin: 0 auto;
+            opacity: 0;
+            transform: translateY(40px);
+        }
+        
+        .video-container.visible {
+            animation: fadeUp 1s ease forwards;
+        }
+        
+        .instagram-wrapper {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid var(--border);
+        }
+        
+        /* Services Grid */
+        .services-section {
+            padding: 120px 60px;
+        }
+        
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1px;
+            background: var(--border);
+            border: 1px solid var(--border);
+        }
+        
+        .service-card {
+            background: var(--bg-primary);
+            padding: 60px;
+            transition: all 0.4s ease;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        
+        .service-card.visible {
+            animation: fadeUp 0.8s ease forwards;
+        }
+        
+        .service-card:hover {
+            background: var(--bg-secondary);
+        }
+        
+        .service-number {
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            color: var(--accent);
+            margin-bottom: 20px;
+        }
+        
+        .service-card h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 400;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+        
+        .service-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.8;
+        }
+        
+        /* Measurement Section */
+        .measurement-section {
+            padding: 120px 60px;
+            background: var(--bg-secondary);
+        }
+        
+        .measurement-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .measurement-content h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-weight: 400;
+            margin-bottom: 30px;
+            color: var(--text-primary);
+        }
+        
+        .measurement-content > p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            line-height: 1.8;
+            margin-bottom: 40px;
+        }
+        
+        .measurement-item {
+            padding: 25px 0;
+            border-bottom: 1px solid var(--border);
+            opacity: 0;
+            transform: translateX(-30px);
+        }
+        
+        .measurement-item.visible {
+            animation: fadeRight 0.8s ease forwards;
+        }
+        
+        @keyframes fadeRight {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .measurement-item strong {
+            display: block;
+            font-size: 1.1rem;
+            color: var(--accent);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .measurement-item p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+        
+        .measurement-visual {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 40px;
+            border: 1px solid var(--border);
+        }
+        
+        .measurement-visual svg {
+            width: 100%;
+            max-width: 280px;
+            height: auto;
+        }
+        
+        .tape-line {
+            stroke: var(--accent);
+            stroke-width: 3;
+            fill: none;
+            animation: tapeGlow 3s ease-in-out infinite;
+        }
+        
+        @keyframes tapeGlow {
+            0%, 100% { stroke-opacity: 0.5; }
+            50% { stroke-opacity: 1; }
+        }
+        
+        /* CTA Section */
+        .cta-section {
+            padding: 150px 60px;
+            text-align: center;
+            background: var(--bg-primary);
+        }
+        
+        .cta-section h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 400;
+            margin-bottom: 30px;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        
+        .cta-section h2.visible {
+            animation: fadeUp 0.8s ease forwards;
+        }
+        
+        .cta-section p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 500px;
+            margin: 0 auto 50px;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        
+        .cta-section p.visible {
+            animation: fadeUp 0.8s ease forwards 0.2s;
+        }
+        
+        .cta-button-large {
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+            padding: 22px 50px;
+            background: var(--accent);
+            color: var(--bg-primary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            transition: all 0.4s ease;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        
+        .cta-button-large.visible {
+            animation: fadeUp 0.8s ease forwards 0.4s;
+        }
+        
+        .cta-button-large:hover {
+            background: var(--accent-light);
+            transform: translateY(-2px);
+        }
+        
+        /* Footer */
+        footer {
+            padding: 80px 60px 40px;
+            border-top: 1px solid var(--border);
+        }
+        
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 60px;
+        }
+        
+        .footer-brand {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            margin-bottom: 15px;
+        }
+        
+        .footer-tagline {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        .footer-links {
+            display: flex;
+            gap: 60px;
+        }
+        
+        .footer-column h4 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+        
+        .footer-column a {
+            display: block;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-column a:hover {
+            color: var(--accent);
+        }
+        
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 40px;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 900px) {
+            nav {
+                padding: 20px 30px;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+            
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .measurement-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                gap: 40px;
+            }
+            
+            .footer-links {
+                flex-direction: column;
+                gap: 30px;
+            }
+            
+            .content-section,
+            .services-section,
+            .measurement-section,
+            .video-section,
+            .stats-section {
+                padding: 80px 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loader -->
+    <div class="loader" id="loader">
+        <div class="loader-text">CAPORAL</div>
+    </div>
+    
+    <!-- Navigation -->
+    <nav id="navbar">
+        <a href="#" class="nav-logo">Rinaldo Caporal</a>
+        <ul class="nav-links">
+            <li><a href="#sobre">Sobre</a></li>
+            <li><a href="#servicos">Serviços</a></li>
+            <li><a href="#guia">Guia</a></li>
+            <li><a href="#contato">Contato</a></li>
+        </ul>
+    </nav>
+    
+    <!-- Hero -->
+    <section class="hero">
+        <div class="hero-label">Assessoria Nutricional</div>
+        <h1>Eu serei <em>o seu guia</em></h1>
+        <p class="hero-subtitle">Assessoria nutricional de alto nível com acompanhamento personalizado e resultados comprovados.</p>
+        <a href="#contato" class="hero-cta">
+            Começar Agora
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+        </a>
+        
+        <div class="scroll-indicator">
+            <span>Scroll</span>
+            <div class="scroll-line"></div>
+        </div>
+    </section>
+    
+    <!-- Stats -->
+    <section class="stats-section">
+        <div class="stats-grid">
+            <div class="stat-item" data-animate>
+                <div class="stat-number">500+</div>
+                <div class="stat-label">Alunos Transformados</div>
+            </div>
+            <div class="stat-item" data-animate>
+                <div class="stat-number">10+</div>
+                <div class="stat-label">Anos de Experiência</div>
+            </div>
+            <div class="stat-item" data-animate>
+                <div class="stat-number">98%</div>
+                <div class="stat-label">Taxa de Satisfação</div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Video Section -->
+    <section class="video-section" id="sobre">
+        <div class="section-header" style="text-align: center; margin-bottom: 60px;">
+            <div class="section-label">Conteúdo Exclusivo</div>
+            <h2 class="section-title">Acompanhe dicas e insights<br>no Instagram</h2>
+        </div>
+        
+        <div class="video-container" data-animate>
+            <div class="instagram-wrapper">
+                <blockquote 
+                    class="instagram-media" 
+                    data-instgrm-permalink="https://www.instagram.com/p/DOCO9PMksqQ/"
+                    data-instgrm-version="14"
+                    data-instgrm-captioned
+                    style="background:#FFF; border:0; border-radius:8px; margin: 0 auto; max-width:540px; min-width:326px; padding:0; width:99.375%;"
+                >
+                    <div style="padding:16px;">
+                        <a href="https://www.instagram.com/p/DOCO9PMksqQ/" style="background:#FFFFFF; line-height:0; padding:0 0; text-align:center; text-decoration:none; width:100%;" target="_blank">
+                            <div style="display:flex; flex-direction:row; align-items:center;">
+                                <div style="background-color:#F4F4F4; border-radius:50%; flex-grow:0; height:40px; margin-right:14px; width:40px;"></div>
+                                <div style="display:flex; flex-direction:column; flex-grow:1; justify-content:center;">
+                                    <div style="background-color:#F4F4F4; border-radius:4px; flex-grow:0; height:14px; margin-bottom:6px; width:100px;"></div>
+                                    <div style="background-color:#F4F4F4; border-radius:4px; flex-grow:0; height:14px; width:60px;"></div>
+                                </div>
+                            </div>
+                            <div style="padding:19% 0;"></div>
+                            <div style="display:block; height:50px; margin:0 auto 12px; width:50px;">
+                                <svg width="50px" height="50px" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+                                    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                        <g fill="#000000">
+                                            <path d="M556.869,30.41 C554.814,30.41 553.148,32.076 553.148,34.131 C553.148,36.186 554.814,37.852 556.869,37.852 C558.924,37.852 560.59,36.186 560.59,34.131 C560.59,32.076 558.924,30.41 556.869,30.41 M541,60.657 C535.114,60.657 530.342,55.887 530.342,50 C530.342,44.114 535.114,39.342 541,39.342 C546.887,39.342 551.658,44.114 551.658,50 C551.658,55.887 546.887,60.657 541,60.657 M541,33.886 C532.1,33.886 524.886,41.1 524.886,50 C524.886,58.899 532.1,66.113 541,66.113 C549.9,66.113 557.115,58.899 557.115,50 C557.115,41.1 549.9,33.886 541,33.886 M565.378,62.101 C565.244,65.022 564.756,66.606 564.346,67.663 C563.803,69.06 563.154,70.057 562.106,71.106 C561.058,72.155 560.06,72.803 558.662,73.347 C557.607,73.757 556.021,74.244 553.102,74.378 C549.944,74.521 548.997,74.552 541,74.552 C533.003,74.552 532.056,74.521 528.898,74.378 C525.979,74.244 524.393,73.757 523.338,73.347 C521.94,72.803 520.942,72.155 519.894,71.106 C518.846,70.057 518.197,69.06 517.654,67.663 C517.244,66.606 516.755,65.022 516.623,62.101 C516.479,58.943 516.448,57.996 516.448,50 C516.448,42.003 516.479,41.056 516.623,37.899 C516.755,34.978 517.244,33.391 517.654,32.338 C518.197,30.938 518.846,29.942 519.894,28.894 C520.942,27.846 521.94,27.196 523.338,26.654 C524.393,26.244 525.979,25.756 528.898,25.623 C532.057,25.479 533.004,25.448 541,25.448 C548.996,25.448 549.943,25.479 553.102,25.623 C556.021,25.756 557.607,26.244 558.662,26.654 C560.06,27.196 561.058,27.846 562.106,28.894 C563.154,29.942 563.803,30.938 564.346,32.338 C564.756,33.391 565.244,34.978 565.378,37.899 C565.522,41.056 565.552,42.003 565.552,50 C565.552,57.996 565.522,58.943 565.378,62.101 M570.82,37.631 C570.674,34.438 570.167,32.258 569.425,30.349 C568.659,28.377 567.633,26.702 565.965,25.035 C564.297,23.368 562.623,22.342 560.652,21.575 C558.743,20.834 556.562,20.326 553.369,20.18 C550.169,20.033 549.148,20 541,20 C532.851,20 531.83,20.033 528.631,20.18 C525.438,20.326 523.257,20.834 521.349,21.575 C519.376,22.342 517.703,23.368 516.035,25.035 C514.368,26.702 513.342,28.377 512.575,30.349 C511.834,32.258 511.326,34.438 511.181,37.631 C511.035,40.831 511,41.851 511,50 C511,58.147 511.035,59.17 511.181,62.369 C511.326,65.562 511.834,67.743 512.575,69.651 C513.342,71.625 514.368,73.296 516.035,74.965 C517.703,76.634 519.376,77.658 521.349,78.425 C523.257,79.167 525.438,79.673 528.631,79.82 C531.831,79.965 532.851,80 541,80 C549.148,80 550.169,79.965 553.369,79.82 C556.562,79.673 558.743,79.167 560.652,78.425 C562.623,77.658 564.297,76.634 565.965,74.965 C567.633,73.296 568.659,71.625 569.425,69.651 C570.167,67.743 570.674,65.562 570.82,62.369 C570.966,59.17 571,58.147 571,50 C571,41.851 570.966,40.831 570.82,37.631"></path>
+                                        </g>
+                                    </g>
+                                </svg>
+                            </div>
+                            <div style="padding-top:8px;">
+                                <div style="color:#3897f0; font-family:Arial,sans-serif; font-size:14px; font-style:normal; font-weight:550; line-height:18px;">Ver esta publicação no Instagram</div>
+                            </div>
+                        </a>
+                    </div>
+                </blockquote>
+                <script async src="//www.instagram.com/embed.js"></script>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Services -->
+    <section class="services-section" id="servicos">
+        <div class="section-header">
+            <div class="section-label">O que oferecemos</div>
+            <h2 class="section-title">Nossos Serviços</h2>
+        </div>
+        
+        <div class="services-grid">
+            <div class="service-card" data-animate>
+                <div class="service-number">01</div>
+                <h3>Avaliação Completa</h3>
+                <p>Análise detalhada da composição corporal, histórico alimentar e estilo de vida para um plano personalizado.</p>
+            </div>
+            
+            <div class="service-card" data-animate>
+                <div class="service-number">02</div>
+                <h3>Plano Alimentar</h3>
+                <p>Cardápios estratégicos que respeitam suas preferências, rotina e objetivos específicos.</p>
+            </div>
+            
+            <div class="service-card" data-animate>
+                <div class="service-number">03</div>
+                <h3>Acompanhamento</h3>
+                <p>Suporte contínuo via app com ajustes em tempo real e orientações personalizadas.</p>
+            </div>
+            
+            <div class="service-card" data-animate>
+                <div class="service-number">04</div>
+                <h3>Metas & Resultados</h3>
+                <p>Definição de objetivos claros com acompanhamento de evolução e ajustes constantes.</p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Measurement Guide -->
+    <section class="measurement-section" id="guia">
+        <div class="section-header" style="text-align: center; margin-bottom: 80px;">
+            <div class="section-label">Guia Prático</div>
+            <h2 class="section-title">Como medir sua cintura<br>corretamente</h2>
+        </div>
+        
+        <div class="measurement-grid">
+            <div class="measurement-content">
+                <p>A medição correta da circunferência da cintura é essencial para avaliar sua saúde metabólica e acompanhar sua evolução de forma precisa.</p>
+                
+                <div class="measurement-item" data-animate>
+                    <strong>Posicione na menor região</strong>
+                    <p>A fita deve ser posicionada na menor circunferência da cintura, geralmente logo acima do umbigo, onde o torso naturalmente se estreita.</p>
+                </div>
+                
+                <div class="measurement-item" data-animate>
+                    <strong>Mantenha a fita reta</strong>
+                    <p>A fita deve permanecer paralela ao chão, sem inclinações para cima ou para baixo. Use um espelho para verificar.</p>
+                </div>
+                
+                <div class="measurement-item" data-animate>
+                    <strong>Meça em contato com a pele</strong>
+                    <p>A fita deve ficar em contato com a pele, mas sem apertar. Você deve conseguir respirar confortavelmente.</p>
+                </div>
+                
+                <div class="measurement-item" data-animate>
+                    <strong>Relaxe e expire</strong>
+                    <p>Relaxe o abdômen e meça após expirar normalmente. Não contraia os músculos nem prenda a respiração.</p>
+                </div>
+            </div>
+            
+            <div class="measurement-visual">
+                <svg viewBox="0 0 300 400" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Silhueta do corpo -->
+                    <ellipse cx="150" cy="40" rx="20" ry="12" fill="#c9a96e" opacity="0.8"/>
+                    
+                    <path d="M 95 58 Q 150 48 205 58 L 215 85 Q 150 78 85 85 Z" fill="#a08050" opacity="0.9"/>
+                    
+                    <path d="M 85 85 Q 65 130 60 185" stroke="#a08050" stroke-width="22" fill="none" stroke-linecap="round" opacity="0.9"/>
+                    
+                    <path d="M 215 85 Q 235 130 240 185" stroke="#a08050" stroke-width="22" fill="none" stroke-linecap="round" opacity="0.9"/>
+                    
+                    <path d="M 90 85 Q 150 78 210 85 L 200 160 Q 150 153 100 160 Z" fill="#c9a96e" opacity="0.8"/>
+                    
+                    <path d="M 100 160 Q 150 153 200 160 L 190 230 Q 150 223 110 230 Z" fill="#a08050" opacity="0.9"/>
+                    
+                    <path d="M 110 230 L 105 350" stroke="#a08050" stroke-width="28" fill="none" stroke-linecap="round" opacity="0.9"/>
+                    
+                    <path d="M 190 230 L 195 350" stroke="#a08050" stroke-width="28" fill="none" stroke-linecap="round" opacity="0.9"/>
+                    
+                    <!-- Linha de referência do umbigo -->
+                    <line x1="75" y1="135" x2="225" y2="135" stroke="#555" stroke-width="1" stroke-dasharray="4,4" opacity="0.5"/>
+                    
+                    <text x="230" y="140" fill="#666" font-size="10">Nível do umbigo</text>
+                    
+                    <!-- Fita métrica na menor região -->
+                    <ellipse class="tape-line" cx="150" cy="118" rx="70" ry="15"/>
+                    
+                    <!-- Marcadores laterais -->
+                    <line x1="80" y1="118" x2="75" y2="118" stroke="#c9a96e" stroke-width="3"/>
+                    
+                    <line x1="220" y1="118" x2="225" y2="118" stroke="#c9a96e" stroke-width="3"/>
+                    
+                    <!-- Seta indicando menor região -->
+                    <g>
+                        <line x1="150" y1="85" x2="150" y2="100" stroke="#c9a96e" stroke-width="2" marker-end="url(#arrow)"/>
+                        
+                        <text x="155" y="95" fill="#c9a96e" font-size="10">Menor região</text>
+                    </g>
+                    
+                    <!-- Label da fita -->
+                    <rect x="175" y="105" width="85" height="26" rx="5" fill="rgba(201, 169, 110, 0.15)" stroke="#c9a96e"/>
+                    
+                    <text x="217" y="123" fill="#c9a96e" font-size="11" text-anchor="middle" font-weight="500">FITA RETA</text>
+                    
+                    <defs>
+                        <marker id="arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                            <polygon points="0 0, 10 3.5, 0 7" fill="#c9a96e"/>
+                        </marker>
+                    </defs>
+                </svg>
+            </div>
+        </div>
+    </section>
+    
+    <!-- CTA Section -->
+    <section class="cta-section" id="contato">
+        <h2 data-animate>Pronto para sua transformação?</h2>
+        
+        <p data-animate>Entre em contato e descubra como a assessoria pode ajudar você a alcançar seus objetivos.</p>
+        
+        <a href="https://www.instagram.com/rinaldocaporal/" target="_blank" class="cta-button-large" data-animate>
+            Falar no Instagram
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+        </a>
+    </section>
+    
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div>
+                <div class="footer-brand">Rinaldo Caporal</div>
+                <div class="footer-tagline">Nutricionista Esportivo | Criador do H.compass 🧭</div>
+            </div>
+            
+            <div class="footer-links">
+                <div class="footer-column">
+                    <h4>Navegação</h4>
+                    <a href="#sobre">Sobre</a>
+                    <a href="#servicos">Serviços</a>
+                    <a href="#guia">Guia</a>
+                    <a href="#contato">Contato</a>
+                </div>
+                
+                <div class="footer-column">
+                    <h4>Social</h4>
+                    <a href="https://www.instagram.com/rinaldocaporal/" target="_blank">Instagram</a>
+                    <a href="#">LinkedIn</a>
+                    <a href="#">YouTube</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <span>© 2026 Rinaldo Caporal. Todos os direitos reservados.</span>
+            <span>Criador do framework H.compass | Co-Founder @healthcompass.app</span>
+        </div>
+    </footer>
+    
+    <script>
+        // Loader
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('loader').classList.add('hidden');
+            }, 1500);
+        });
+        
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 100) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+        
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+        
+        document.querySelectorAll('[data-animate]').forEach(el => {
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
