@@ -3,7 +3,7 @@
 // Fonte: https://icones.js.org
 // Estilo: Outline (linhas, sem preenchimento)
 // Bibliotecas: Lucide + Healthicons + Tabler
-// Total: 115 ícones em 20 categorias
+// Total: 165 ícones em 20 categorias
 // ============================================================
 
 // ============================================================
@@ -16,9 +16,19 @@
 { icon: 'healthicons:thermometer', name: 'Termômetro', cat: 'saude_geral' },
 { icon: 'lucide:pill', name: 'Comprimido', cat: 'saude_geral' },
 { icon: 'lucide:syringe', name: 'Seringa', cat: 'saude_geral' },
+{ icon: 'lucide:heart-pulse', name: 'Batimento', cat: 'saude_geral' },
+{ icon: 'lucide:eye', name: 'Olho', cat: 'saude_geral' },
+{ icon: 'lucide:ear', name: 'Ouvido', cat: 'saude_geral' },
+{ icon: 'lucide:tooth', name: 'Dente', cat: 'saude_geral' },
+{ icon: 'lucide:bone', name: 'Osso', cat: 'saude_geral' },
+{ icon: 'lucide:brain-circuit', name: 'Neuro', cat: 'saude_geral' },
+{ icon: 'lucide:lungs', name: 'Pulmão', cat: 'saude_geral' },
+{ icon: 'lucide:hand-heart', name: 'Cuidado', cat: 'saude_geral' },
+{ icon: 'lucide:hospital', name: 'Hospital', cat: 'saude_geral' },
+{ icon: 'lucide:clipboard-plus', name: 'Prontuário', cat: 'saude_geral' },
 
 // ============================================================
-// 2. NUTRIÇÃO E ALIMENTAÇÃO (EXPANDIDO)
+// 2. NUTRIÇÃO E ALIMENTAÇÃO (EXPANDIDO - 17 ícones)
 // ============================================================
 { icon: 'lucide:apple', name: 'Maçã', cat: 'nutricao_alimentacao' },
 { icon: 'lucide:carrot', name: 'Cenoura', cat: 'nutricao_alimentacao' },
@@ -27,9 +37,19 @@
 { icon: 'lucide:scale', name: 'Balança', cat: 'nutricao_alimentacao' },
 { icon: 'lucide:flame', name: 'Calorias', cat: 'nutricao_alimentacao' },
 { icon: 'lucide:chef-hat', name: 'Chef', cat: 'nutricao_alimentacao' },
+{ icon: 'lucide:shopping-basket', name: 'Cesta', cat: 'nutricao_alimentacao' },
+{ icon: 'lucide:refrigerator', name: 'Geladeira', cat: 'nutricao_alimentacao' },
+{ icon: 'lucide:microwave', name: 'Micro-ondas', cat: 'nutricao_alimentacao' },
+{ icon: 'lucide:blender', name: 'Liquidificador', cat: 'nutricao_alimentacao' },
+{ icon: 'lucide:timer', name: 'Timer', cat: 'nutricao_alimentacao' },
+{ icon: 'lucide:book-open', name: 'Receitas', cat: 'nutricao_alimentacao' },
+{ icon: 'lucide:leaf', name: 'Natural', cat: 'nutricao_alimentacao' },
+{ icon: 'lucide:seedling', name: 'Orgânico', cat: 'nutricao_alimentacao' },
+{ icon: 'lucide:vegan', name: 'Vegano', cat: 'nutricao_alimentacao' },
+{ icon: 'lucide:gluten-free', name: 'Sem Glúten', cat: 'nutricao_alimentacao' },
 
 // ============================================================
-// 3. ATIVIDADE FÍSICA E EXERCÍCIO (EXPANDIDO)
+// 3. ATIVIDADE FÍSICA E EXERCÍCIO (EXPANDIDO - 18 ícones)
 // ============================================================
 { icon: 'tabler:run', name: 'Corrida', cat: 'atividade_fisica' },
 { icon: 'lucide:dumbbell', name: 'Haltere', cat: 'atividade_fisica' },
@@ -39,6 +59,21 @@
 { icon: 'lucide:mountain', name: 'Montanha', cat: 'atividade_fisica' },
 { icon: 'lucide:footprints', name: 'Passos', cat: 'atividade_fisica' },
 { icon: 'lucide:zap', name: 'Energia', cat: 'atividade_fisica' },
+{ icon: 'lucide:timer', name: 'Cronômetro', cat: 'atividade_fisica' },
+{ icon: 'lucide:map-pin', name: 'Localização', cat: 'atividade_fisica' },
+{ icon: 'lucide:navigation', name: 'Navegação', cat: 'atividade_fisica' },
+{ icon: 'lucide:gauge', name: 'Velocidade', cat: 'atividade_fisica' },
+{ icon: 'lucide:flame', name: 'Queima', cat: 'atividade_fisica' },
+{ icon: 'lucide:medal', name: 'Medalha', cat: 'atividade_fisica' },
+{ icon: 'lucide:crown', name: 'Coroa', cat: 'atividade_fisica' },
+{ icon: 'lucide:star', name: 'Estrela', cat: 'atividade_fisica' },
+{ icon: 'lucide:heart', name: 'Favorito', cat: 'atividade_fisica' },
+{ icon: 'lucide:share-2', name: 'Compartilhar', cat: 'atividade_fisica' },
+{ icon: 'lucide:users', name: 'Grupo', cat: 'atividade_fisica' },
+{ icon: 'lucide:trophy', name: 'Conquista', cat: 'atividade_fisica' },
+{ icon: 'lucide:target', name: 'Objetivo', cat: 'atividade_fisica' },
+{ icon: 'lucide:clipboard-list', name: 'Registro', cat: 'atividade_fisica' },
+{ icon: 'lucide:calendar-check', name: 'Agendamento', cat: 'atividade_fisica' },
 
 // ============================================================
 // 4. METAS E PROGRESSO
@@ -113,6 +148,16 @@
 { icon: 'healthicons:headache', name: 'Dor de Cabeça', cat: 'sintomas_queixas' },
 { icon: 'lucide:frown', name: 'Indisposição', cat: 'sintomas_queixas' },
 { icon: 'lucide:nausea', name: 'Náusea', cat: 'sintomas_queixas' },
+{ icon: 'lucide:frown', name: 'Tristeza', cat: 'sintomas_queixas' },
+{ icon: 'lucide:meh', name: 'Indiferença', cat: 'sintomas_queixas' },
+{ icon: 'lucide:angry', name: 'Irritação', cat: 'sintomas_queixas' },
+{ icon: 'lucide:cloud-rain', name: 'Depressão', cat: 'sintomas_queixas' },
+{ icon: 'lucide:wind', name: 'Falta de Ar', cat: 'sintomas_queixas' },
+{ icon: 'lucide:snowflake', name: 'Calafrio', cat: 'sintomas_queixas' },
+{ icon: 'lucide:sun', name: 'Alergia Solar', cat: 'sintomas_queixas' },
+{ icon: 'lucide:cloud-lightning', name: 'Enxaqueca', cat: 'sintomas_queixas' },
+{ icon: 'lucide:umbrella', name: 'Resfriado', cat: 'sintomas_queixas' },
+{ icon: 'lucide:shield-x', name: 'Imunidade Baixa', cat: 'sintomas_queixas' },
 
 // ============================================================
 // 12. HÁBITOS E COMPORTAMENTO
@@ -160,7 +205,7 @@
 { icon: 'lucide:x', name: 'Fechar', cat: 'navegacao_interface' },
 
 // ============================================================
-// 17. ALIMENTOS ESPECÍFICOS (EXPANDIDO)
+// 17. ALIMENTOS ESPECÍFICOS (EXPANDIDO - 20 ícones)
 // ============================================================
 { icon: 'lucide:beef', name: 'Carne', cat: 'alimentos_especificos' },
 { icon: 'lucide:fish', name: 'Peixe', cat: 'alimentos_especificos' },
@@ -172,6 +217,16 @@
 { icon: 'lucide:croissant', name: 'Pão', cat: 'alimentos_especificos' },
 { icon: 'lucide:salad', name: 'Salada', cat: 'alimentos_especificos' },
 { icon: 'lucide:soup', name: 'Sopa', cat: 'alimentos_especificos' },
+{ icon: 'lucide:pizza', name: 'Pizza', cat: 'alimentos_especificos' },
+{ icon: 'lucide:hamburger', name: 'Hambúrguer', cat: 'alimentos_especificos' },
+{ icon: 'lucide:ice-cream', name: 'Sorvete', cat: 'alimentos_especificos' },
+{ icon: 'lucide:cake', name: 'Bolo', cat: 'alimentos_especificos' },
+{ icon: 'lucide:coffee', name: 'Café', cat: 'alimentos_especificos' },
+{ icon: 'lucide:beer', name: 'Cerveja', cat: 'alimentos_especificos' },
+{ icon: 'lucide:wine', name: 'Vinho', cat: 'alimentos_especificos' },
+{ icon: 'lucide:citrus', name: 'Limão', cat: 'alimentos_especificos' },
+{ icon: 'lucide:grape', name: 'Uva', cat: 'alimentos_especificos' },
+{ icon: 'lucide:banana', name: 'Banana', cat: 'alimentos_especificos' },
 
 // ============================================================
 // 18. RESTRIÇÕES ALIMENTARES
