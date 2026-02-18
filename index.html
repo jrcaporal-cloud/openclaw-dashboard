@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenClaw Dashboard | Real-Time</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-card: rgba(255,255,255,0.03);
+            --border: rgba(255,255,255,0.08);
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --accent: #6366f1;
+            --accent-glow: rgba(99, 102, 241, 0.3);
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        /* Background Animation */
+        .bg-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                linear-gradient(rgba(99, 102, 241, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(99, 102, 241, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+        }
+        
+        /* Header */
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent) 0%, #8b5cf6 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+        
+        .logo-text {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+        
+        .logo-text span {
+            color: var(--accent);
+        }
+        
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+        
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        /* Stats Row */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+        }
+        
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        
+        .stat-change {
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+        }
+        
+        .stat-change.positive { color: var(--success); }
+        .stat-change.negative { color: var(--danger); }
+        
+        /* Main Grid */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        /* Card Base */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .card-badge {
+            background: rgba(99, 102, 241, 0.2);
+            color: var(--accent);
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        /* Projects */
+        .project-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .project-item {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .project-item:hover {
+            background: rgba(255,255,255,0.04);
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+        
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        
+        .project-name {
+            font-weight: 600;
+        }
+        
+        .project-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .project-status.active {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+        }
+        
+        .project-status.paused {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--warning);
+        }
+        
+        .project-progress {
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+        
+        .project-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent) 0%, #8b5cf6 100%);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+        
+        .project-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        
+        /* Tasks */
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .task-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .task-item:hover {
+            background: rgba(255,255,255,0.04);
+        }
+        
+        .task-priority {
+            width: 4px;
+            height: 40px;
+            border-radius: 2px;
+        }
+        
+        .task-priority.high { background: var(--danger); }
+        .task-priority.medium { background: var(--warning); }
+        .task-priority.low { background: var(--success); }
+        
+        .task-content {
+            flex: 1;
+        }
+        
+        .task-title {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+        
+        .task-meta {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        
+        .task-time {
+            font-size: 0.85rem;
+            color: var(--accent);
+            font-weight: 500;
+        }
+        
+        /* Services */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+        
+        .service-item {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.25rem;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .service-item.online {
+            border-color: rgba(16, 185, 129, 0.3);
+            background: rgba(16, 185, 129, 0.05);
+        }
+        
+        .service-item.offline {
+            border-color: rgba(239, 68, 68, 0.3);
+            background: rgba(239, 68, 68, 0.05);
+        }
+        
+        .service-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin: 0 auto 0.75rem;
+        }
+        
+        .service-item.online .service-icon {
+            background: rgba(16, 185, 129, 0.15);
+        }
+        
+        .service-item.offline .service-icon {
+            background: rgba(239, 68, 68, 0.15);
+        }
+        
+        .service-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .service-status {
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        .service-item.online .service-status {
+            color: var(--success);
+        }
+        
+        .service-item.offline .service-status {
+            color: var(--danger);
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        
+        .service-item.online .status-dot {
+            background: var(--success);
+            animation: blink 2s infinite;
+        }
+        
+        .service-item.offline .status-dot {
+            background: var(--danger);
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        
+        /* Activity Log */
+        .activity-log {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .activity-item {
+            display: flex;
+            gap: 1rem;
+            padding: 0.875rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+        
+        .activity-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+        
+        .activity-icon.create { background: rgba(59, 130, 246, 0.15); }
+        .activity-icon.complete { background: rgba(16, 185, 129, 0.15); }
+        .activity-icon.move { background: rgba(245, 158, 11, 0.15); }
+        .activity-icon.delete { background: rgba(239, 68, 68, 0.15); }
+        
+        .activity-content {
+            flex: 1;
+        }
+        
+        .activity-text {
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .activity-time {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+        
+        /* Bottom Grid */
+        .bottom-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 1.5rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .stats-row { grid-template-columns: repeat(2, 1fr); }
+            .main-grid { grid-template-columns: 1fr; }
+            .bottom-grid { grid-template-columns: 1fr; }
+            .services-grid { grid-template-columns: 1fr; }
+        }
+        
+        @media (max-width: 640px) {
+            .stats-row { grid-template-columns: 1fr; }
+            .container { padding: 1rem; }
+            .header { padding: 1rem; flex-direction: column; gap: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-grid"></div>
+    
+    <header class="header">
+        <div class="logo">
+            <div class="logo-icon">⚡</div>
+            <div class="logo-text">Open<span>Claw</span> Dashboard</div>
+        </div>
+        
+        <div class="live-indicator">
+            <div class="live-dot"></div>
+            <span>LIVE — Atualizando</span>
+        </div>
+    </header>
+    
+    <div class="container">
+        <!-- Stats Row -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-label">Tarefas Hoje</div>
+                <div class="stat-value" id="tasks-today">12</div>
+                <div class="stat-change positive">+3 vs ontem</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-label">Tempo Trabalhado</div>
+                <div class="stat-value" id="time-worked">4h 32m</div>
+                <div class="stat-change positive">+1h 15m</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-label">Concluídas (1h)</div>
+                <div class="stat-value" id="completed-hour">5</div>
+                <div class="stat-change positive">+2</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-label">Projetos Ativos</div>
+                <div class="stat-value" id="active-projects">4</div>
+                <div class="stat-change">2 em andamento</div>
+            </div>
+        </div>
+        
+        <!-- Main Grid -->
+        <div class="main-grid">
+            <!-- Projects -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">📁 Projetos Ativos</div>
+                    <div class="card-badge" id="project-count">4</div>
+                </div>
+                
+                <div class="project-list" id="project-list">
+                    <div class="project-item" data-project="1">
+                        <div class="project-header">
+                            <div class="project-name">Landing Page Antropometria</div>
+                            <div class="project-status active">Em andamento</div>
+                        </div>
+                        <div class="project-progress">
+                            <div class="project-progress-bar" style="width: 85%"></div>
+                        </div>
+                        
+                        <div class="project-meta">
+                            <span>85% completo</span>
+                            <span class="project-updated">Atualizado há 2 min</span>
+                        </div>
+                    </div>
+                    
+                    <div class="project-item" data-project="2">
+                        <div class="project-header">
+                            <div class="project-name">Dashboard Real-Time</div>
+                            <div class="project-status active">Em andamento</div>
+                        </div>
+                        <div class="project-progress">
+                            <div class="project-progress-bar" style="width: 60%"></div>
+                        </div>
+                        
+                        <div class="project-meta">
+                            <span>60% completo</span>
+                            <span class="project-updated">Atualizado agora</span>
+                        </div>
+                    </div>
+                    
+                    <div class="project-item" data-project="3">
+                        <div class="project-header">
+                            <div class="project-name">Integração WhatsApp</div>
+                            <div class="project-status paused">Pausado</div>
+                        </div>
+                        <div class="project-progress">
+                            <div class="project-progress-bar" style="width: 30%"></div>
+                        </div>
+                        
+                        <div class="project-meta">
+                            <span>30% completo</span>
+                            <span class="project-updated">Atualizado há 1h</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tasks -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">✓ Tarefas em Andamento</div>
+                    <div class="card-badge" id="task-count">5</div>
+                </div>
+                
+                <div class="task-list" id="task-list">
+                    <div class="task-item" data-task="1">
+                        <div class="task-priority high"></div>
+                        <div class="task-content">
+                            <div class="task-title">Revisar código do dashboard</div>
+                            <div class="task-meta">Projeto: Dashboard Real-Time</div>
+                        </div>
+                        <div class="task-time">45m</div>
+                    </div>
+                    
+                    <div class="task-item" data-task="2">
+                        <div class="task-priority medium"></div>
+                        <div class="task-content">
+                            <div class="task-title">Atualizar documentação</div>
+                            <div class="task-meta">Projeto: Landing Page</div>
+                        </div>
+                        <div class="task-time">20m</div>
+                    </div>
+                    
+                    <div class="task-item" data-task="3">
+                        <div class="task-priority low"></div>
+                        <div class="task-content">
+                            <div class="task-title">Testar responsividade</div>
+                            <div class="task-meta">Projeto: Landing Page</div>
+                        </div>
+                        <div class="task-time">10m</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Bottom Grid -->
+        <div class="bottom-grid">
+            <!-- Services -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">🔌 Status de Serviços</div>
+                </div>
+                
+                <div class="services-grid" id="services-grid">
+                    <div class="service-item online" data-service="whatsapp">
+                        <div class="service-icon">💬</div>
+                        <div class="service-name">WhatsApp</div>
+                        <div class="service-status">
+                            <div class="status-dot"></div>
+                            Online
+                        </div>
+                    </div>
+                    
+                    <div class="service-item online" data-service="gateway">
+                        <div class="service-icon">⚡</div>
+                        <div class="service-name">Gateway</div>
+                        <div class="service-status">
+                            <div class="status-dot"></div>
+                            Online
+                        </div>
+                    </div>
+                    
+                    <div class="service-item online" data-service="cron">
+                        <div class="service-icon">⏰</div>
+                        <div class="service-name">Cron Jobs</div>
+                        <div class="service-status">
+                            <div class="status-dot"></div>
+                            Ativo
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Activity Log -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">📋 Log de Atividades</div>
+                    <div class="card-badge" id="log-count">8</div>
+                </div>
+                
+                <div class="activity-log" id="activity-log">
+                    <div class="activity-item">
+                        <div class="activity-icon create">➕</div>
+                        <div class="activity-content">
+                            <div class="activity-text">Nova tarefa criada: "Revisar código do dashboard"</div>
+                            <div class="activity-time">Há 2 minutos</div>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon complete">✓</div>
+                        <div class="activity-content">
+                            <div class="activity-text">Tarefa concluída: "Criar mockup 4K"</div>
+                            <div class="activity-time">Há 15 minutos</div>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon move">↔</div>
+                        <div class="activity-content">
+                            <div class="activity-text">Projeto movido: "Dashboard" → Em andamento</div>
+                            <div class="activity-time">Há 32 minutos</div>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon create">➕</div>
+                        <div class="activity-content">
+                            <div class="activity-text">Novo projeto criado: "Dashboard Real-Time"</div>
+                            <div class="activity-time">Há 1 hora</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Dados simulados
+        const projects = [
+            { id: 1, name: 'Landing Page Antropometria', progress: 85, status: 'active', updated: 2 },
+            { id: 2, name: 'Dashboard Real-Time', progress: 60, status: 'active', updated: 0 },
+            { id: 3, name: 'Integração WhatsApp', progress: 30, status: 'paused', updated: 60 }
+        ];
+        
+        const tasks = [
+            { id: 1, title: 'Revisar código do dashboard', project: 'Dashboard Real-Time', priority: 'high', time: 45 },
+            { id: 2, title: 'Atualizar documentação', project: 'Landing Page', priority: 'medium', time: 20 },
+            { id: 3, title: 'Testar responsividade', project: 'Landing Page', priority: 'low', time: 10 }
+        ];
+        
+        const activities = [
+            { type: 'create', text: 'Nova tarefa criada: "Revisar código do dashboard"', time: 2 },
+            { type: 'complete', text: 'Tarefa concluída: "Criar mockup 4K"', time: 15 },
+            { type: 'move', text: 'Projeto movido: "Dashboard" → Em andamento', time: 32 },
+            { type: 'create', text: 'Novo projeto criado: "Dashboard Real-Time"', time: 60 }
+        ];
+        
+        // Atualização em tempo real
+        function updateStats() {
+            // Atualiza contadores aleatoriamente
+            const tasksToday = document.getElementById('tasks-today');
+            const currentTasks = parseInt(tasksToday.textContent);
+            if (Math.random() > 0.7) {
+                tasksToday.textContent = currentTasks + 1;
+            }
+            
+            // Atualiza tempo trabalhado
+            const timeWorked = document.getElementById('time-worked');
+            const [hours, minutes] = timeWorked.textContent.split('h ').map(x => parseInt(x));
+            const totalMinutes = hours * 60 + minutes + 1;
+            const newHours = Math.floor(totalMinutes / 60);
+            const newMinutes = totalMinutes % 60;
+            timeWorked.textContent = `${newHours}h ${newMinutes.toString().padStart(2, '0')}m`;
+        }
+        
+        function updateProjects() {
+            projects.forEach(project => {
+                if (project.status === 'active' && project.progress < 100) {
+                    project.progress += Math.random() > 0.8 ? 1 : 0;
+                    project.updated += 1;
+                }
+            });
+            
+            renderProjects();
+        }
+        
+        function renderProjects() {
+            const container = document.getElementById('project-list');
+            container.innerHTML = projects.map(project => `
+                <div class="project-item" data-project="${project.id}">
+                    <div class="project-header">
+                        <div class="project-name">${project.name}</div>
+                        <div class="project-status ${project.status}">${project.status === 'active' ? 'Em andamento' : 'Pausado'}</div>
+                    </div>
+                    <div class="project-progress">
+                        <div class="project-progress-bar" style="width: ${project.progress}%"></div>
+                    </div>
+                    
+                    <div class="project-meta">
+                        <span>${project.progress}% completo</span>
+                        <span class="project-updated">${project.updated === 0 ? 'Atualizado agora' : `Atualizado há ${project.updated} min`}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function updateTasks() {
+            tasks.forEach(task => {
+                task.time += 1;
+            });
+            
+            renderTasks();
+        }
+        
+        function renderTasks() {
+            const container = document.getElementById('task-list');
+            container.innerHTML = tasks.map(task => `
+                <div class="task-item" data-task="${task.id}">
+                    <div class="task-priority ${task.priority}"></div>
+                    <div class="task-content">
+                        <div class="task-title">${task.title}</div>
+                        <div class="task-meta">Projeto: ${task.project}</div>
+                    </div>
+                    <div class="task-time">${task.time}m</div>
+                </div>
+            `).join('');
+        }
+        
+        function toggleService() {
+            const services = document.querySelectorAll('.service-item');
+            const randomService = services[Math.floor(Math.random() * services.length)];
+            
+            if (Math.random() > 0.9) {
+                randomService.classList.toggle('online');
+                randomService.classList.toggle('offline');
+                
+                const statusText = randomService.querySelector('.service-status');
+                const isOnline = randomService.classList.contains('online');
+                statusText.innerHTML = `
+                    <div class="status-dot"></div>
+                    ${isOnline ? 'Online' : 'Offline'}
+                `;
+            }
+        }
+        
+        function addActivity() {
+            if (Math.random() > 0.95) {
+                const types = ['create', 'complete', 'move'];
+                const texts = [
+                    'Nova tarefa criada: "Testar integração"',
+                    'Tarefa concluída: "Revisar design"',
+                    'Projeto atualizado: "Landing Page"',
+                    'Novo commit enviado: "Fix bug #123"'
+                ];
+                
+                const newActivity = {
+                    type: types[Math.floor(Math.random() * types.length)],
+                    text: texts[Math.floor(Math.random() * texts.length)],
+                    time: 0
+                };
+                
+                activities.unshift(newActivity);
+                if (activities.length > 10) activities.pop();
+                
+                renderActivities();
+            }
+        }
+        
+        function renderActivities() {
+            const container = document.getElementById('activity-log');
+            const icons = { create: '➕', complete: '✓', move: '↔', delete: '🗑' };
+            
+            container.innerHTML = activities.map(activity => `
+                <div class="activity-item">
+                    <div class="activity-icon ${activity.type}">${icons[activity.type]}</div>
+                    <div class="activity-content">
+                        <div class="activity-text">${activity.text}</div>
+                        <div class="activity-time">${activity.time === 0 ? 'Agora' : `Há ${activity.time} minutos`}</div>
+                    </div>
+                </div>
+            `).join('');
+            
+            document.getElementById('log-count').textContent = activities.length;
+        }
+        
+        // Inicializa atualizações
+        setInterval(updateStats, 5000);
+        setInterval(updateProjects, 10000);
+        setInterval(updateTasks, 60000);
+        setInterval(toggleService, 15000);
+        setInterval(addActivity, 8000);
+        
+        // Atualiza timestamps
+        setInterval(() => {
+            activities.forEach(a => a.time += 1);
+            renderActivities();
+        }, 60000);
+    </script>
+</body>
+</html>
